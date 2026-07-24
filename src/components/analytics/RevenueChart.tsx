@@ -13,6 +13,7 @@ import {
 import { ChartDataPoint } from "@/lib/mock-data/analytics"
 import { SlidersHorizontal, ChevronDown, Check } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 interface RevenueChartProps {
@@ -32,6 +33,15 @@ const attributeOptions = [
 export function RevenueChart({ data, selectedMetric = "all", onSelectMetric }: RevenueChartProps) {
   const [currentAttr, setCurrentAttr] = React.useState<string>(selectedMetric)
   const [dropdownOpen, setDropdownOpen] = React.useState(false)
+  const [isMounted, setIsMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  React.useEffect(() => {
+    setCurrentAttr(selectedMetric)
+  }, [selectedMetric])
 
   const activeOption = attributeOptions.find((o) => o.id === currentAttr) || attributeOptions[0]
 
@@ -41,7 +51,6 @@ export function RevenueChart({ data, selectedMetric = "all", onSelectMetric }: R
     setDropdownOpen(false)
   }
 
-  // Get Y-Axis Domain & Formatters depending on selected attribute
   const getYConfig = () => {
     switch (currentAttr) {
       case "deals":
@@ -132,85 +141,91 @@ export function RevenueChart({ data, selectedMetric = "all", onSelectMetric }: R
       </div>
 
       {/* Chart Area Container */}
-      <div className="h-[340px] w-full pt-2">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-            <defs>
-              <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={yConfig.strokeColor} stopOpacity={0.28} />
-                <stop offset="95%" stopColor={yConfig.strokeColor} stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
+      <div className="h-[340px] min-h-[320px] w-full pt-2 relative">
+        {!isMounted ? (
+          <div className="h-full w-full flex items-center justify-center p-4">
+            <Skeleton className="h-[300px] w-full rounded-2xl" />
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={320} minHeight={300}>
+            <AreaChart data={data} margin={{ top: 15, right: 15, left: -15, bottom: 0 }}>
+              <defs>
+                <linearGradient id="analyticsPurpleGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={yConfig.strokeColor} stopOpacity={0.28} />
+                  <stop offset="95%" stopColor={yConfig.strokeColor} stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
 
-            {/* Grid with vertical dashed lines matching screenshot */}
-            <CartesianGrid
-              strokeDasharray="4 4"
-              vertical={true}
-              horizontal={true}
-              stroke="var(--border, #E4E4E7)"
-              opacity={0.5}
-            />
+              {/* Grid with vertical dashed lines matching screenshot */}
+              <CartesianGrid
+                strokeDasharray="4 4"
+                vertical={true}
+                horizontal={true}
+                stroke="#E4E4E7"
+                opacity={0.6}
+              />
 
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#64748B", fontSize: 13, fontWeight: 500 }}
-              ticks={["Apr 29", "May 6", "May 13", "May 20", "May 27"]}
-              dy={10}
-            />
+              <XAxis
+                dataKey="date"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#64748B", fontSize: 13, fontWeight: 500 }}
+                ticks={["Apr 29", "May 6", "May 13", "May 20", "May 27"]}
+                dy={10}
+              />
 
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#64748B", fontSize: 13, fontWeight: 500 }}
-              domain={yConfig.domain}
-              ticks={yConfig.ticks}
-              tickFormatter={yConfig.formatter}
-            />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#64748B", fontSize: 13, fontWeight: 500 }}
+                domain={yConfig.domain}
+                ticks={yConfig.ticks}
+                tickFormatter={yConfig.formatter}
+              />
 
-            <Tooltip
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const item = payload[0].payload as ChartDataPoint
-                  const val = payload[0].value as number
-                  return (
-                    <div className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 p-3 text-xs font-semibold shadow-xl flex flex-col gap-0.5 border border-slate-700 dark:border-slate-300">
-                      <span className="text-slate-400 dark:text-slate-500 font-medium">
-                        {item.displayDate}
-                      </span>
-                      <span className="text-base font-bold">
-                        {yConfig.tooltipLabel(val)}
-                      </span>
-                    </div>
-                  )
-                }
-                return null
-              }}
-            />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const item = payload[0].payload as ChartDataPoint
+                    const val = payload[0].value as number
+                    return (
+                      <div className="rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 p-3 text-xs font-semibold shadow-xl flex flex-col gap-0.5 border border-slate-700 dark:border-slate-300">
+                        <span className="text-slate-400 dark:text-slate-500 font-medium">
+                          {item.displayDate}
+                        </span>
+                        <span className="text-base font-bold">
+                          {yConfig.tooltipLabel(val)}
+                        </span>
+                      </div>
+                    )
+                  }
+                  return null
+                }}
+              />
 
-            <Area
-              type="monotone"
-              dataKey={yConfig.dataKey}
-              stroke={yConfig.strokeColor}
-              strokeWidth={3}
-              fillOpacity={1}
-              fill="url(#purpleGradient)"
-              dot={{
-                r: 4.5,
-                fill: yConfig.strokeColor,
-                stroke: "#FFFFFF",
-                strokeWidth: 2.5,
-              }}
-              activeDot={{
-                r: 7.5,
-                fill: yConfig.strokeColor,
-                stroke: "#FFFFFF",
-                strokeWidth: 3,
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+              <Area
+                type="monotone"
+                dataKey={yConfig.dataKey}
+                stroke={yConfig.strokeColor}
+                strokeWidth={3}
+                fillOpacity={1}
+                fill="url(#analyticsPurpleGradient)"
+                dot={{
+                  r: 4.5,
+                  fill: yConfig.strokeColor,
+                  stroke: "#FFFFFF",
+                  strokeWidth: 2.5,
+                }}
+                activeDot={{
+                  r: 7.5,
+                  fill: yConfig.strokeColor,
+                  stroke: "#FFFFFF",
+                  strokeWidth: 3,
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   )
