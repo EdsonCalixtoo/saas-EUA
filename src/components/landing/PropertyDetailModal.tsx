@@ -48,7 +48,6 @@ export function PropertyDetailModal({
             alt={property.title}
             fill
             className="object-cover transition-all duration-300"
-            unoptimized
           />
           <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/20">
             {property.tag}
@@ -71,7 +70,7 @@ export function PropertyDetailModal({
                   selectedImg === img ? "border-indigo-600 scale-105" : "border-transparent opacity-70 hover:opacity-100"
                 }`}
               >
-                <Image src={img} alt="Thumb" fill className="object-cover" unoptimized />
+                <Image src={img} alt="Thumb" fill className="object-cover" />
               </button>
             ))}
           </div>
@@ -118,7 +117,7 @@ export function PropertyDetailModal({
             {property.brokerName && (
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden border border-slate-200 shrink-0">
-                  <Image src={property.brokerAvatar || ""} alt="Broker" fill className="object-cover" unoptimized />
+                  <Image src={property.brokerAvatar || ""} alt="Broker" fill className="object-cover" />
                 </div>
                 <div className="flex flex-col text-left">
                   <span className="text-xs font-bold text-slate-900 dark:text-white">{property.brokerName}</span>

@@ -57,7 +57,6 @@ export function TestimonialsSection() {
                     alt={t.author}
                     fill
                     className="object-cover"
-                    unoptimized
                   />
                 </div>
                 <div className="flex flex-col">

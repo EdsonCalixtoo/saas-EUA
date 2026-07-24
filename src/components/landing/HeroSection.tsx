@@ -157,7 +157,6 @@ export function HeroSection() {
                       alt="Property Preview"
                       fill
                       className="object-cover"
-                      unoptimized
                     />
                     <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
                       R$ 4.850.000
