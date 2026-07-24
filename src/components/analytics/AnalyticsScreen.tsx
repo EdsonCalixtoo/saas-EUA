@@ -8,6 +8,7 @@ import { RevenueChart } from "./RevenueChart"
 
 export function AnalyticsScreen() {
   const [timeRange, setTimeRange] = React.useState("This Month")
+  const [selectedAttribute, setSelectedAttribute] = React.useState<string>("all")
 
   return (
     <div className="flex flex-col h-full w-full max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
@@ -32,10 +33,18 @@ export function AnalyticsScreen() {
       {/* ─── Main Outer Card Container ─── */}
       <div className="flex flex-col gap-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs">
         {/* Top 4 KPI Metrics Grid */}
-        <AnalyticsMetricsGrid metrics={analyticsMetrics} />
+        <AnalyticsMetricsGrid
+          metrics={analyticsMetrics}
+          selectedMetricId={selectedAttribute}
+          onSelectMetric={(id) => setSelectedAttribute(id)}
+        />
 
         {/* Bottom Large Revenue Over Time Chart */}
-        <RevenueChart data={revenueTimeData} />
+        <RevenueChart
+          data={revenueTimeData}
+          selectedMetric={selectedAttribute}
+          onSelectMetric={(id) => setSelectedAttribute(id)}
+        />
       </div>
     </div>
   )
