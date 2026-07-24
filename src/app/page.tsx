@@ -1,6 +1,11 @@
-import { redirect } from "next/navigation"
+import { LandingPage } from "@/components/landing/LandingPage"
+import type { Metadata } from "next"
 
-export default function RootPage() {
-  // Root redirects to the dashboard (handled by the (dashboard) route group)
-  redirect("/dashboard")
+export const metadata: Metadata = {
+  title: "PropFlow | Plataforma Imobiliária SaaS de Alto Padrão",
+  description: "Encontre, anuncie e venda imóveis com inteligência artificial, CRM, mapas, discador e automações.",
+}
+
+export default function HomePage() {
+  return <LandingPage />
 }
