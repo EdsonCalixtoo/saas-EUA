@@ -6,11 +6,14 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { Heart, Share2, MapPin, Bed, Bath, Car, Maximize, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { featuredPropertiesData } from "@/lib/mock-data/landing"
+import { featuredPropertiesData, FeaturedProperty } from "@/lib/mock-data/landing"
+import { PropertyDetailModal } from "./PropertyDetailModal"
 import { toast } from "sonner"
 
 export function FeaturedPropertiesSection() {
   const [favorites, setFavorites] = React.useState<Record<string, boolean>>({})
+  const [selectedProp, setSelectedProp] = React.useState<FeaturedProperty | null>(null)
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
 
   const toggleFavorite = (id: string, title: string) => {
     setFavorites((prev) => {
@@ -22,6 +25,11 @@ export function FeaturedPropertiesSection() {
 
   const handleShare = (title: string) => {
     toast.success(`Link de "${title}" copiado para compartilhar!`)
+  }
+
+  const handleOpenDetails = (prop: FeaturedProperty) => {
+    setSelectedProp(prop)
+    setIsModalOpen(true)
   }
 
   return (
@@ -66,7 +74,7 @@ export function FeaturedPropertiesSection() {
                 className="group flex flex-col justify-between rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300"
               >
                 {/* Top Image Container */}
-                <div className="relative h-56 w-full overflow-hidden">
+                <div className="relative h-56 w-full overflow-hidden cursor-pointer" onClick={() => handleOpenDetails(prop)}>
                   <Image
                     src={prop.imageUrl}
                     alt={prop.title}
@@ -83,7 +91,10 @@ export function FeaturedPropertiesSection() {
                   {/* Top Right Favorite & Share Action Buttons */}
                   <div className="absolute top-3 right-3 flex items-center gap-2">
                     <button
-                      onClick={() => toggleFavorite(prop.id, prop.title)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleFavorite(prop.id, prop.title)
+                      }}
                       className={`h-9 w-9 rounded-full flex items-center justify-center backdrop-blur-md border transition-all ${
                         isFav
                           ? "bg-red-500 text-white border-red-500"
@@ -95,7 +106,10 @@ export function FeaturedPropertiesSection() {
                     </button>
 
                     <button
-                      onClick={() => handleShare(prop.title)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleShare(prop.title)
+                      }}
                       className="h-9 w-9 rounded-full bg-white/80 hover:bg-white text-slate-700 backdrop-blur-md border border-white/60 flex items-center justify-center transition-all"
                       aria-label="Compartilhar"
                     >
@@ -113,7 +127,7 @@ export function FeaturedPropertiesSection() {
 
                 {/* Card Body */}
                 <div className="flex flex-col p-5 gap-3 flex-1 justify-between">
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 cursor-pointer" onClick={() => handleOpenDetails(prop)}>
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                       {prop.city} • {prop.neighborhood}
@@ -142,11 +156,12 @@ export function FeaturedPropertiesSection() {
                   </div>
 
                   {/* Bottom Action Button */}
-                  <Link href="/properties">
-                    <Button className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-800 dark:text-slate-100 font-bold rounded-xl h-10 text-xs transition-colors">
-                      Ver Detalhes
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={() => handleOpenDetails(prop)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-800 dark:text-slate-100 font-bold rounded-xl h-10 text-xs transition-colors"
+                  >
+                    Ver Detalhes
+                  </Button>
                 </div>
               </motion.div>
             )
@@ -154,6 +169,13 @@ export function FeaturedPropertiesSection() {
         </div>
 
       </div>
+
+      {/* Property Detail Gallery Modal */}
+      <PropertyDetailModal
+        property={selectedProp}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
     </section>
   )
 }
