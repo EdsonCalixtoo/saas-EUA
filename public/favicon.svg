@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <rect width="120" height="120" rx="28" fill="#0F172A"/>
+  {/* D Shape */}
+  <path d="M 24 20 H 55 C 73 20 85 30 85 48 C 85 62 76 72 60 76 L 48 64 C 58 62 65 55 65 46 C 65 35 57 30 47 30 H 38 V 86 H 24 V 20 Z" fill="#FFFFFF"/>
+  <path d="M 38 64 L 52 48 L 62 58 L 48 74 Z" fill="#FFFFFF"/>
+  {/* Growth Arrow */}
+  <path d="M 36 80 L 60 104 L 96 36 L 82 36 L 98 20 L 98 42 L 86 30 L 57 87 L 43 73 Z" fill="#2563EB"/>
+  <path d="M 82 36 L 98 20 L 98 42 Z" fill="#3B82F6"/>
+</svg>
