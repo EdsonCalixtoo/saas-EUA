@@ -50,21 +50,43 @@ const nav: NavItem[] = [
   // --- DIVIDER ---
   { icon: null, label: "div1", isDivider: true },
 
-  // --- GROWTH & TOOLS ---
-  { icon: Bot,             label: "AI Agents",       to: null },
-  { icon: Megaphone,       label: "Marketing",       to: null },
-  { icon: Zap,             label: "Automation",      to: null },
-  { icon: Globe,           label: "Sites",           to: null },
-  { icon: Award,           label: "Memberships",     to: null },
-  { icon: Image,           label: "Media Storage",   to: null },
-  { icon: Star,            label: "Reputation",      to: null },
-  { icon: BarChart3,       label: "Reporting",       to: null },
-  { icon: LayoutGrid,      label: "App Marketplace", to: null },
-  { icon: Calculator,      label: "Rehab Calc",      to: "/rehab-calc" as const },
-  { icon: List,            label: "Buyer List",      to: "/buyer-list" as const },
-  { icon: TrendingUp,      label: "Kpi Tracker",     to: "/kpi-tracker" as const },
-  { icon: Building,        label: "Title Companies", to: "/title-companies" as const },
-  { icon: ShieldAlert,     label: "Vip Discord Access", to: null },
+  // --- MARKETING & GROWTH ---
+  {
+    icon: Megaphone,
+    label: "Marketing & Growth",
+    children: [
+      { icon: Bot,       label: "AI Agents",    to: null },
+      { icon: Megaphone, label: "Marketing",    to: null },
+      { icon: Zap,       label: "Automation",   to: null },
+      { icon: Globe,     label: "Sites",        to: null },
+      { icon: Award,     label: "Memberships",  to: null },
+      { icon: Star,      label: "Reputation",   to: null },
+    ]
+  },
+  
+  // --- INVESTOR TOOLS ---
+  {
+    icon: Calculator,
+    label: "Investor Tools",
+    children: [
+      { icon: Calculator, label: "Rehab Calc",      to: "/rehab-calc" as const },
+      { icon: List,       label: "Buyer List",      to: "/buyer-list" as const },
+      { icon: TrendingUp, label: "KPI Tracker",     to: "/kpi-tracker" as const },
+      { icon: Building,   label: "Title Companies", to: "/title-companies" as const },
+      { icon: BarChart3,  label: "Reporting",       to: null },
+    ]
+  },
+
+  // --- SYSTEM & APPS ---
+  {
+    icon: LayoutGrid,
+    label: "System & Apps",
+    children: [
+      { icon: LayoutGrid,  label: "App Marketplace", to: null },
+      { icon: Image,       label: "Media Storage",   to: null },
+      { icon: ShieldAlert, label: "VIP Discord",     to: null },
+    ]
+  }
 ];
 
 export function Sidebar() {
@@ -72,10 +94,9 @@ export function Sidebar() {
   const pathname = routerState.location.pathname;
   const { isOpen, close } = useSidebar();
 
-  const isInsideConversations = ["/communications", "/calls", "/sms", "/email"].includes(pathname);
-
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    Conversations: isInsideConversations,
+    Conversations: ["/communications", "/calls", "/sms", "/email"].includes(pathname),
+    "Investor Tools": ["/rehab-calc", "/buyer-list", "/kpi-tracker", "/title-companies"].includes(pathname),
   });
 
   const toggleGroup = (label: string) => {
