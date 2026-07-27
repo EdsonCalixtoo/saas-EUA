@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PropertiesPage } from '@/components/crm/PropertiesPage';
+import { PropertiesPage } from '@/components/crm/PropertiesPage'; 
 import { Sidebar } from '@/components/crm/Sidebar';
 import { Topbar } from '@/components/crm/Topbar';
 

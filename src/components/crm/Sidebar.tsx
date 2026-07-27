@@ -4,6 +4,8 @@ import {
   LayoutDashboard, Users, GitBranch, MessageSquare, Phone, MessageCircle,
   Mail, CheckSquare, Calendar, Contact, Home, Megaphone, Zap, FileText,
   BarChart3, Plug, Settings, ChevronDown, ChevronRight, X, Inbox,
+  CreditCard, Bot, Globe, Award, Image, Star, LayoutGrid, Calculator,
+  List, TrendingUp, Building, ShieldAlert
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DealVantaLogo } from "@/components/crm/DealVantaLogo";
@@ -17,16 +19,21 @@ interface NavSubItem {
 }
 
 interface NavItem {
-  icon: any;
+  icon: any | null;
   label: string;
   to?: string | null;
   children?: NavSubItem[];
+  isDivider?: boolean;
 }
 
 const nav: NavItem[] = [
+  // --- CORE CRM ---
   { icon: LayoutDashboard, label: "Dashboard",      to: "/" as const },
   { icon: Users,           label: "Leads",           to: "/leads" as const },
+  { icon: Calendar,        label: "Calendars",      to: "/calendar" as const },
+  { icon: Contact,         label: "Contacts",        to: "/contacts" as const },
   { icon: GitBranch,       label: "Opportunities",   to: "/pipeline" as const },
+  { icon: Home,            label: "Properties",      to: "/properties" as const },
   {
     icon: MessageSquare,
     label: "Conversations",
@@ -37,21 +44,27 @@ const nav: NavItem[] = [
       { icon: Mail,          label: "Email",              to: "/email" as const },
     ],
   },
-  {
-    icon: CheckSquare,
-    label: "Tasks & Calendar",
-    children: [
-      { icon: CheckSquare,  label: "All Tasks",         to: "/tasks" as const },
-      { icon: Calendar,     label: "Calendar Schedule", to: "/calendar" as const },
-    ],
-  },
-  { icon: Contact,         label: "Contacts",        to: "/contacts" as const },
-  { icon: Home,            label: "Properties",      to: "/properties" as const },
-  { icon: Megaphone,       label: "Campaigns",       to: null },
-  { icon: Zap,             label: "Automations",     to: null },
-  { icon: FileText,        label: "Documents",       to: null },
-  { icon: BarChart3,       label: "Reports",         to: null },
-  { icon: Plug,            label: "Integrations",    to: null },
+  { icon: CheckSquare,     label: "Tasks",           to: "/tasks" as const },
+  { icon: CreditCard,      label: "Payments",        to: null },
+
+  // --- DIVIDER ---
+  { icon: null, label: "div1", isDivider: true },
+
+  // --- GROWTH & TOOLS ---
+  { icon: Bot,             label: "AI Agents",       to: null },
+  { icon: Megaphone,       label: "Marketing",       to: null },
+  { icon: Zap,             label: "Automation",      to: null },
+  { icon: Globe,           label: "Sites",           to: null },
+  { icon: Award,           label: "Memberships",     to: null },
+  { icon: Image,           label: "Media Storage",   to: null },
+  { icon: Star,            label: "Reputation",      to: null },
+  { icon: BarChart3,       label: "Reporting",       to: null },
+  { icon: LayoutGrid,      label: "App Marketplace", to: null },
+  { icon: Calculator,      label: "Rehab Calc",      to: null },
+  { icon: List,            label: "Buyer List",      to: null },
+  { icon: TrendingUp,      label: "Kpi Tracker",     to: null },
+  { icon: Building,        label: "Title Companies", to: null },
+  { icon: ShieldAlert,     label: "Vip Discord Access", to: null },
 ];
 
 export function Sidebar() {
@@ -60,11 +73,9 @@ export function Sidebar() {
   const { isOpen, close } = useSidebar();
 
   const isInsideConversations = ["/communications", "/calls", "/sms", "/email"].includes(pathname);
-  const isInsideTasks = ["/tasks", "/calendar"].includes(pathname);
 
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     Conversations: isInsideConversations,
-    "Tasks & Calendar": isInsideTasks,
   });
 
   const toggleGroup = (label: string) => {
@@ -86,15 +97,19 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
-        {nav.map((item) => {
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
+        {nav.map((item, idx) => {
+          if (item.isDivider) {
+            return <div key={`div-${idx}`} className="my-3 border-t border-sidebar-border/40 mx-2" />;
+          }
+
           // Group parent
           if (item.children) {
             const isExpanded = !!expandedGroups[item.label];
             const hasActiveChild = item.children.some(child => child.to !== null && pathname === child.to);
 
             return (
-              <div key={item.label} className="space-y-1">
+              <div key={item.label} className="space-y-0.5">
                 <button
                   onClick={() => toggleGroup(item.label)}
                   className={cn(
@@ -117,7 +132,7 @@ export function Sidebar() {
 
                 {/* Sub-items */}
                 {isExpanded && (
-                  <div className="ml-3 pl-3 border-l border-sidebar-border/40 space-y-1 my-1">
+                  <div className="ml-3 pl-3 border-l border-sidebar-border/40 space-y-0.5 my-1">
                     {item.children.map(sub => {
                       const isSubActive = sub.to !== null && pathname === sub.to;
                       const subClass = cn(
@@ -154,11 +169,6 @@ export function Sidebar() {
                             <sub.icon className="h-3.5 w-3.5 shrink-0" />
                             <span>{sub.label}</span>
                           </div>
-                          {sub.badge && (
-                            <span className="rounded-full bg-sidebar-accent px-1.5 py-0.2 text-[9px] font-semibold text-sidebar-foreground">
-                              {sub.badge}
-                            </span>
-                          )}
                         </div>
                       );
                     })}
@@ -171,7 +181,7 @@ export function Sidebar() {
           // Single Items
           const isActive = item.to !== null && pathname === item.to;
           const baseClass = cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
             isActive
               ? "bg-gradient-to-r from-primary to-primary-glow text-white shadow-md"
               : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-white",
@@ -202,9 +212,11 @@ export function Sidebar() {
 
       {/* Footer / User Profile */}
       <div className="border-t border-sidebar-border p-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-white">
-          <Settings className="h-4 w-4" />
-          Settings
+        <button className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-white">
+          <div className="flex items-center gap-3">
+            <Settings className="h-4 w-4 shrink-0" />
+            <span>Settings</span>
+          </div>
         </button>
         <div className="mt-2 flex items-center gap-3 rounded-lg bg-sidebar-accent/50 p-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-xs font-semibold text-white">
