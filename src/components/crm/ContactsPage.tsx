@@ -3,492 +3,581 @@ import {
   Contact, Search, Plus, Filter, Phone, Mail, User, Building2,
   DollarSign, Home, Star, ShieldCheck, Tag, MoreHorizontal,
   ChevronLeft, ChevronRight, Download, Upload, ArrowUpDown,
-  CheckCircle2, X, Eye, Hammer, Briefcase, FileSpreadsheet,
+  CheckCircle2, X, Eye, Settings, SlidersHorizontal, CheckSquare,
+  Building, RefreshCw, FileText, Layers, Trash2, SendHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type ContactType = "all" | "seller" | "buyer" | "vendor" | "lender";
+type TopSubTab = "contacts" | "smartlists" | "bulkactions" | "customfields" | "tasks" | "companies";
 
-interface CrmContact {
+interface ContactRecord {
   id: number;
   name: string;
   initials: string;
   color: string;
-  type: "Seller" | "Cash Buyer" | "Vendor/Contractor" | "Lender/Title";
-  email: string;
   phone: string;
+  email: string;
+  businessName: string;
+  createdDate: string;
+  lastActivity: string;
+  lastActivityType?: "phone" | "email" | "sms";
+  tags: string[];
   city: string;
   state: string;
-  dealsCount: number;
-  buyBoxMax?: number;
-  preferredMarkets?: string;
-  companyName?: string;
-  rating?: number;
-  tags: string[];
-  status: "Active" | "VIP" | "Lead" | "Inactive";
+}
+
+interface SmartList {
+  id: number;
+  name: string;
+  count: number;
+}
+
+interface CustomField {
+  id: number;
+  name: string;
+  type: "Text" | "Number" | "Date" | "Dropdown";
+  placeholder: string;
 }
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
-const MOCK_CONTACTS: CrmContact[] = [
-  {
-    id: 1,
-    name: "John Smith",
-    initials: "JS",
-    color: "oklch(0.55 0.22 265)",
-    type: "Seller",
-    email: "john.smith@gmail.com",
-    phone: "(813) 555-2234",
-    city: "Tampa",
-    state: "FL",
-    dealsCount: 1,
-    tags: ["Motivated Seller", "High Equity", "123 Main St"],
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Marcus Vance",
-    initials: "MV",
-    color: "oklch(0.7 0.18 155)",
-    type: "Cash Buyer",
-    email: "marcus@vancecapital.com",
-    phone: "(813) 555-9012",
-    city: "Tampa",
-    state: "FL",
-    dealsCount: 5,
-    buyBoxMax: 250000,
-    preferredMarkets: "Tampa, St. Petersburg, Brandon (33602, 33701)",
-    companyName: "Vance Real Estate Holdings",
-    rating: 5.0,
-    tags: ["VIP Buyer", "Fast Closing", "Multi-Family"],
-    status: "VIP",
-  },
-  {
-    id: 3,
-    name: "Emily Brown",
-    initials: "EB",
-    color: "oklch(0.65 0.24 25)",
-    type: "Seller",
-    email: "emily.brown@yahoo.com",
-    phone: "(321) 555-3456",
-    city: "Kissimmee",
-    state: "FL",
-    dealsCount: 1,
-    tags: ["Absentee Owner", "321 Elm St"],
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "Sarah Jenkins",
-    initials: "SJ",
-    color: "oklch(0.68 0.19 275)",
-    type: "Lender/Title",
-    email: "sarah@preferredtitlefl.com",
-    phone: "(813) 555-4422",
-    city: "Tampa",
-    state: "FL",
-    dealsCount: 12,
-    companyName: "Preferred Title & Escrow FL",
-    rating: 4.9,
-    tags: ["Investor Friendly", "Fast Escrow"],
-    status: "VIP",
-  },
-  {
-    id: 5,
-    name: "Carlos Rodriguez",
-    initials: "CR",
-    color: "oklch(0.78 0.17 75)",
-    type: "Vendor/Contractor",
-    email: "carlos@rodriguezrenovations.com",
-    phone: "(407) 555-8899",
-    city: "Orlando",
-    state: "FL",
-    dealsCount: 8,
-    companyName: "Rodriguez General Renovations LLC",
-    rating: 4.8,
-    tags: ["GC License", "Roofing & Rehab"],
-    status: "Active",
-  },
+const INITIAL_CONTACTS: ContactRecord[] = [
+  { id: 1,  name: "Leigh Keller",       initials: "LK", color: "#a855f7", phone: "(580) 713-9488", email: "leigh.keller@gmail.com", businessName: "Keller Property Group",   createdDate: "Jul 24, 2026 01:09 PM", lastActivity: "2 days ago",  lastActivityType: "phone", tags: ["lawton", "motivated-seller"], city: "Lawton", state: "OK" },
+  { id: 2,  name: "Lee Carter",          initials: "LC", color: "#ec4899", phone: "(580) 591-2369", email: "lee.carter@yahoo.com",    businessName: "Carter Holdings LLC",    createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "3 hours ago", lastActivityType: "phone", tags: ["lawton"], city: "Lawton", state: "OK" },
+  { id: 3,  name: "Christopher Campbell",initials: "CC", color: "#3b82f6", phone: "(580) 583-8005", email: "chris@campbellrealty.com", businessName: "Campbell Investments", createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "1 day ago",   lastActivityType: "email", tags: ["lawton", "cash-buyer"], city: "Lawton", state: "OK" },
+  { id: 4,  name: "Garen Trantum",       initials: "GT", color: "#10b981", phone: "(580) 284-7633", email: "garen.t@outlook.com",     businessName: "Trantum Capital",        createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "5 hours ago", lastActivityType: "phone", tags: ["lawton"], city: "Lawton", state: "OK" },
+  { id: 5,  name: "Randy Sailor",        initials: "RS", color: "#f97316", phone: "(580) 351-7632", email: "randy@sailorhomes.com",  businessName: "Sailor Properties",      createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "4 days ago",  lastActivityType: "sms",   tags: ["lawton", "absentee"], city: "Lawton", state: "OK" },
+  { id: 6,  name: "Tommie Weeks",        initials: "TW", color: "#06b6d4", phone: "(580) 917-0738", email: "tommie.weeks@gmail.com",  businessName: "",                       createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "Just now",    lastActivityType: "phone", tags: ["lawton"], city: "Lawton", state: "OK" },
+  { id: 7,  name: "Justin Scaffinger",   initials: "JS", color: "#8b5cf6", phone: "(580) 355-4227", email: "justin@scaffinger.net",   businessName: "Scaffinger Corp",        createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "3 days ago",  lastActivityType: "email", tags: ["lawton"], city: "Lawton", state: "OK" },
+  { id: 8,  name: "Brandon Richard",     initials: "BR", color: "#6366f1", phone: "(580) 704-8477", email: "brandon@brichard.com",    businessName: "BR Real Estate",         createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "1 week ago",  lastActivityType: "phone", tags: ["lawton", "vip-buyer"], city: "Lawton", state: "OK" },
+  { id: 9,  name: "Aaron Winkelman",     initials: "AW", color: "#14b8a6", phone: "(580) 647-7516", email: "aaron@winkelman.com",     businessName: "Winkelman Homes",        createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "2 hours ago", lastActivityType: "phone", tags: ["lawton"], city: "Lawton", state: "OK" },
+  { id: 10, name: "Joseph Brennan",      initials: "JB", color: "#f43f5e", phone: "(580) 678-9574", email: "jbrennan@titlefl.com",    businessName: "Preferred Title LLC",    createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "Yesterday",   lastActivityType: "email", tags: ["title-company"], city: "Lawton", state: "OK" },
+  { id: 11, name: "Luis Navas",          initials: "LN", color: "#eab308", phone: "(580) 483-3173", email: "luis.navas@gmail.com",    businessName: "Navas Construction",     createdDate: "Jul 24, 2026 09:18 AM", lastActivity: "3 days ago",  lastActivityType: "phone", tags: ["contractor"], city: "Lawton", state: "OK" },
 ];
 
-const CONTACT_STATS = [
-  { label: "Total Contacts",    value: "148", delta: 12.2, up: true, icon: Contact,      color: "oklch(0.55 0.22 265)" },
-  { label: "Motivated Sellers", value: "86",  delta: 8.4,  up: true, icon: Home,         color: "oklch(0.65 0.24 25)"  },
-  { label: "VIP Cash Buyers",   value: "42",  delta: 15.0, up: true, icon: DollarSign,   color: "oklch(0.7 0.18 155)"  },
-  { label: "Title & Lenders",   value: "12",  delta: 0,    up: true, icon: ShieldCheck,  color: "oklch(0.68 0.19 275)" },
-  { label: "Contractors",       value: "8",   delta: 4.2,  up: true, icon: Hammer,       color: "oklch(0.78 0.17 75)"  },
+const SMART_LISTS: SmartList[] = [
+  { id: 1, name: "All", count: 8504 },
+  { id: 2, name: "Motivated Sellers", count: 3210 },
+  { id: 3, name: "VIP Cash Buyers", count: 1420 },
+  { id: 4, name: "Lawton Leads", count: 854 },
+  { id: 5, name: "Title & Closing", count: 180 },
+];
+
+const CUSTOM_FIELDS: CustomField[] = [
+  { id: 1, name: "Buy Box Max Price", type: "Number", placeholder: "e.g. $250,000" },
+  { id: 2, name: "Target Zip Codes", type: "Text", placeholder: "e.g. 33602, 33701" },
+  { id: 3, name: "Motivated Seller Reason", type: "Dropdown", placeholder: "Inherited, Foreclosure, Relocation" },
+  { id: 4, name: "Estimated Property Value", type: "Number", placeholder: "e.g. $185,000" },
 ];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function ContactsPage() {
-  const [contacts, setContacts]           = useState<CrmContact[]>(MOCK_CONTACTS);
-  const [selectedContact, setSelectedContact] = useState<CrmContact | null>(null);
-  const [activeType, setActiveType]       = useState<ContactType>("all");
-  const [search, setSearch]               = useState("");
-  const [showAddModal, setShowAddModal]   = useState(false);
-  const [toastMsg, setToastMsg]           = useState<string | null>(null);
+  const [topTab, setTopTab]                 = useState<TopSubTab>("contacts");
+  const [activeSmartList, setActiveSmartList] = useState<number>(1);
+  const [contacts, setContacts]             = useState<ContactRecord[]>(INITIAL_CONTACTS);
+  const [selectedIds, setSelectedIds]       = useState<Set<number>>(new Set());
+  const [search, setSearch]                 = useState("");
+  const [sortCol, setSortCol]               = useState<string>("name");
+  const [sortDir, setSortDir]               = useState<"asc" | "desc">("asc");
+  const [currentPage, setCurrentPage]       = useState(1);
+  const [pageSize, setPageSize]             = useState(20);
 
-  // New Contact form
-  const [newName, setNewName]             = useState("");
-  const [newEmail, setNewEmail]           = useState("");
-  const [newPhone, setNewPhone]           = useState("");
-  const [newType, setNewType]             = useState<CrmContact["type"]>("Cash Buyer");
-  const [newCompany, setNewCompany]       = useState("");
+  // Modals
+  const [showAddModal, setShowAddModal]     = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showManageFieldsModal, setShowManageFieldsModal] = useState(false);
+  const [showSmartListModal, setShowSmartListModal] = useState(false);
+  const [toastMsg, setToastMsg]             = useState<string | null>(null);
+
+  // Add Contact Form
+  const [newName, setNewName]               = useState("");
+  const [newPhone, setNewPhone]             = useState("");
+  const [newEmail, setNewEmail]             = useState("");
+  const [newBusiness, setNewBusiness]       = useState("");
+  const [newTag, setNewTag]                 = useState("lawton");
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
   };
 
-  const handleCreateContact = () => {
-    if (!newName.trim()) return;
-
-    const initials = newName.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
-    const created: CrmContact = {
-      id: Date.now(),
-      name: newName.trim(),
-      initials,
-      color: "oklch(0.55 0.22 265)",
-      type: newType,
-      email: newEmail.trim() || "contact@email.com",
-      phone: newPhone.trim() || "(813) 555-0000",
-      city: "Tampa",
-      state: "FL",
-      dealsCount: 0,
-      companyName: newCompany.trim() || undefined,
-      tags: [newType],
-      status: "Active",
-    };
-
-    setContacts(prev => [created, ...prev]);
-    setShowAddModal(false);
-    setNewName("");
-    setNewEmail("");
-    setNewPhone("");
-    showToast("New contact added to directory!");
+  // Toggle selection
+  const toggleSelectAll = () => {
+    if (selectedIds.size === contacts.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(contacts.map(c => c.id)));
   };
 
-  const filteredContacts = contacts.filter(c => {
+  const toggleSelectRow = (id: number) => {
+    const next = new Set(selectedIds);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setSelectedIds(next);
+  };
+
+  // Sorting
+  const handleSort = (col: string) => {
+    if (sortCol === col) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortCol(col); setSortDir("asc"); }
+  };
+
+  const handleCreateContact = () => {
+    if (!newName.trim() && !newPhone.trim()) return;
+
+    const initials = newName
+      ? newName.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2)
+      : "?";
+
+    const created: ContactRecord = {
+      id: Date.now(),
+      name: newName.trim() || "-",
+      initials,
+      color: "#3b82f6",
+      phone: newPhone.trim() || "-",
+      email: newEmail.trim() || "-",
+      businessName: newBusiness.trim() || "",
+      createdDate: "Just now",
+      lastActivity: "Just now",
+      lastActivityType: "phone",
+      tags: [newTag],
+      city: "Lawton",
+      state: "OK",
+    };
+
+    setContacts([created, ...contacts]);
+    setShowAddModal(false);
+    setNewName("");
+    setNewPhone("");
+    setNewEmail("");
+    setNewBusiness("");
+    showToast("Contact added successfully!");
+  };
+
+  const deleteSelected = () => {
+    const count = selectedIds.size;
+    setContacts(contacts.filter(c => !selectedIds.has(c.id)));
+    setSelectedIds(new Set());
+    showToast(`${count} contact(s) deleted.`);
+  };
+
+  // Filtered & Sorted Contacts
+  const filtered = contacts.filter(c => {
     const matchSearch = search === "" ||
       c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase()) ||
       c.phone.includes(search) ||
-      (c.companyName && c.companyName.toLowerCase().includes(search.toLowerCase()));
+      c.email.toLowerCase().includes(search.toLowerCase()) ||
+      c.businessName.toLowerCase().includes(search.toLowerCase()) ||
+      c.tags.some(t => t.toLowerCase().includes(search.toLowerCase()));
+    return matchSearch;
+  });
 
-    const matchType = activeType === "all" ||
-      (activeType === "seller" && c.type === "Seller") ||
-      (activeType === "buyer" && c.type === "Cash Buyer") ||
-      (activeType === "vendor" && c.type === "Vendor/Contractor") ||
-      (activeType === "lender" && c.type === "Lender/Title");
-
-    return matchSearch && matchType;
+  const sorted = [...filtered].sort((a, b) => {
+    let va = "", vb = "";
+    if (sortCol === "name")         { va = a.name; vb = b.name; }
+    if (sortCol === "phone")        { va = a.phone; vb = b.phone; }
+    if (sortCol === "email")        { va = a.email; vb = b.email; }
+    if (sortCol === "businessName") { va = a.businessName; vb = b.businessName; }
+    if (sortCol === "createdDate")  { va = a.createdDate; vb = b.createdDate; }
+    return sortDir === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
   });
 
   return (
     <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden bg-background">
-      {/* ── Top Header + Stats ────────────────────────────────────── */}
+      {/* ── Sub Header Navigation Bar (Matches HighLevel/Salesforce layout) ── */}
       <div className="flex flex-col border-b border-border bg-card">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-foreground">Contacts Directory</h1>
-              <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">148 Active Contacts</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Consolidated database of sellers, cash buyers, title companies, and preferred contractors.</p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => showToast("Exporting CSV contact directory...")}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground hover:bg-accent transition"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Export Directory
-            </button>
-
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-white hover:bg-primary/90 shadow-sm transition"
-            >
-              <Plus className="h-4 w-4" />
-              Add Contact
-            </button>
-          </div>
-        </div>
-
-        {/* Stats Row */}
-        <div className="flex gap-3 overflow-x-auto px-6 py-3 scrollbar-none">
-          {CONTACT_STATS.map(s => (
-            <div key={s.label} className="flex shrink-0 items-center gap-3 rounded-xl border border-border bg-background/50 px-3.5 py-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: s.color + "22" }}>
-                <s.icon className="h-4 w-4" style={{ color: s.color }} />
-              </div>
-              <div>
-                <p className="text-xs font-bold leading-none text-foreground">{s.value}</p>
-                <p className="text-[10px] text-muted-foreground">{s.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Category Tabs */}
-        <div className="flex border-t border-border px-6">
+        {/* Top Navigation Sub Tabs */}
+        <div className="flex items-center gap-6 border-b border-border px-6 pt-3">
           {[
-            { key: "all",    label: "All Contacts", icon: Contact },
-            { key: "seller", label: "Motivated Sellers", icon: Home },
-            { key: "buyer",  label: "Cash Buyers & Investors", icon: DollarSign },
-            { key: "lender", label: "Title & Lenders", icon: ShieldCheck },
-            { key: "vendor", label: "Vendors & Contractors", icon: Hammer },
+            { key: "contacts",     label: "Contacts" },
+            { key: "smartlists",   label: "Smart Lists" },
+            { key: "bulkactions",  label: "Bulk Actions" },
+            { key: "customfields", label: "Custom Fields" },
+            { key: "tasks",        label: "Tasks" },
+            { key: "companies",    label: "Companies" },
           ].map(t => (
             <button
               key={t.key}
-              onClick={() => setActiveType(t.key as ContactType)}
+              onClick={() => setTopTab(t.key as TopSubTab)}
               className={cn(
-                "relative flex items-center gap-2 py-3 px-4 text-xs font-semibold transition-colors",
-                activeType === t.key
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:text-foreground",
+                "pb-3 text-sm font-semibold transition-colors border-b-2",
+                topTab === t.key
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
-              <t.icon className="h-3.5 w-3.5" />
               {t.label}
             </button>
           ))}
         </div>
-      </div>
 
-      {/* ── Toolbar & Table Content ────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {/* Search Bar */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative max-w-sm flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search contact name, company, email, phone..."
-              className="h-9 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-            />
+        {/* Title Header Row */}
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-foreground">Contacts</h1>
+            <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-extrabold text-primary">
+              8,504 Contacts
+            </span>
           </div>
 
-          <span className="text-xs text-muted-foreground font-medium">Showing {filteredContacts.length} contacts</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Import
+            </button>
+
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary/90 shadow-sm transition"
+            >
+              <Plus className="h-4 w-4" />
+              Add Contact
+            </button>
+
+            <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:text-foreground">
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Contacts Table */}
-        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
+        {/* Smart Lists Pills Bar */}
+        <div className="flex items-center gap-2 border-t border-border px-6 py-2 overflow-x-auto">
+          {SMART_LISTS.map(l => (
+            <button
+              key={l.id}
+              onClick={() => setActiveSmartList(l.id)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors",
+                activeSmartList === l.id
+                  ? "bg-primary/10 text-primary border border-primary/30"
+                  : "bg-background border border-border text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <SlidersHorizontal className="h-3 w-3" />
+              {l.name}
+              <span className="rounded-full bg-muted px-1.5 py-0.2 text-[10px] text-muted-foreground">{l.count}</span>
+            </button>
+          ))}
+
+          <button
+            onClick={() => setShowSmartListModal(true)}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline ml-1"
+          >
+            + Add Smart List
+          </button>
+        </div>
+      </div>
+
+      {/* ── Main Tab Content ────────────────────────────────────────── */}
+      {topTab === "contacts" && (
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Toolbar: Filters, Sort, Search, Manage Fields */}
+          <div className="flex items-center justify-between border-b border-border bg-card px-6 py-3 flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <button className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent">
+                <Filter className="h-3.5 w-3.5" />
+                Filters
+              </button>
+
+              <button className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent">
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                Sort
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="relative w-64 sm:w-80">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search Contacts"
+                  className="h-9 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <button
+                onClick={() => setShowManageFieldsModal(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent"
+              >
+                <Settings className="h-3.5 w-3.5" />
+                Manage fields
+              </button>
+            </div>
+          </div>
+
+          {/* Bulk Action Bar (When Rows Selected) */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-3 border-b border-border bg-primary/10 px-6 py-2.5">
+              <span className="text-xs font-bold text-primary">{selectedIds.size} contact(s) selected</span>
+
+              <button onClick={() => showToast(`Sending SMS to ${selectedIds.size} contacts...`)} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-semibold hover:bg-accent">
+                <SendHorizontal className="h-3.5 w-3.5 text-primary" /> Send SMS
+              </button>
+
+              <button onClick={() => showToast(`Sending Email to ${selectedIds.size} contacts...`)} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-semibold hover:bg-accent">
+                <Mail className="h-3.5 w-3.5 text-primary" /> Send Email
+              </button>
+
+              <button onClick={() => showToast(`Adding tags to ${selectedIds.size} contacts...`)} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-semibold hover:bg-accent">
+                <Tag className="h-3.5 w-3.5" /> Add Tag
+              </button>
+
+              <button onClick={deleteSelected} className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-200 px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-100 ml-auto">
+                <Trash2 className="h-3.5 w-3.5" /> Delete Selected
+              </button>
+            </div>
+          )}
+
+          {/* Contacts Data Table */}
+          <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-muted/50 border-b border-border text-muted-foreground font-semibold uppercase tracking-wider text-[10px]">
+              <thead className="bg-muted/50 sticky top-0 z-10 border-b border-border text-muted-foreground font-semibold text-[11px]">
                 <tr>
-                  <th className="p-3.5">Contact Name</th>
-                  <th className="p-3.5">Type</th>
-                  <th className="p-3.5">Contact Details</th>
-                  <th className="p-3.5">Company / Buy Box Criteria</th>
-                  <th className="p-3.5">Deals</th>
-                  <th className="p-3.5">Tags</th>
-                  <th className="p-3.5 text-right">Actions</th>
+                  <th className="w-10 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.size === contacts.length && contacts.length > 0}
+                      onChange={toggleSelectAll}
+                      className="rounded border-border"
+                    />
+                  </th>
+                  <th className="px-4 py-3">
+                    <button onClick={() => handleSort("name")} className="inline-flex items-center gap-1 font-semibold text-foreground">
+                      Contact name <ArrowUpDown className="h-3 w-3 opacity-40" />
+                    </button>
+                  </th>
+                  <th className="px-4 py-3">
+                    <button onClick={() => handleSort("phone")} className="inline-flex items-center gap-1 font-semibold text-foreground">
+                      Phone <ArrowUpDown className="h-3 w-3 opacity-40" />
+                    </button>
+                  </th>
+                  <th className="px-4 py-3">
+                    <button onClick={() => handleSort("email")} className="inline-flex items-center gap-1 font-semibold text-foreground">
+                      Email <ArrowUpDown className="h-3 w-3 opacity-40" />
+                    </button>
+                  </th>
+                  <th className="px-4 py-3">
+                    <button onClick={() => handleSort("businessName")} className="inline-flex items-center gap-1 font-semibold text-foreground">
+                      Business name <ArrowUpDown className="h-3 w-3 opacity-40" />
+                    </button>
+                  </th>
+                  <th className="px-4 py-3">
+                    <button onClick={() => handleSort("createdDate")} className="inline-flex items-center gap-1 font-semibold text-foreground">
+                      Created (PDT) <ArrowUpDown className="h-3 w-3 opacity-40" />
+                    </button>
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-foreground">Last activity...</th>
+                  <th className="px-4 py-3 font-semibold text-foreground">Tags</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
-                {filteredContacts.map(contact => (
-                  <tr key={contact.id} className="hover:bg-accent/30 transition-colors group">
-                    {/* Name + Avatar */}
-                    <td className="p-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white shrink-0" style={{ backgroundColor: contact.color }}>
-                          {contact.initials}
+              <tbody className="divide-y divide-border/50 bg-card">
+                {sorted.map(c => {
+                  const isSelected = selectedIds.has(c.id);
+                  return (
+                    <tr key={c.id} className={cn("hover:bg-accent/40 transition-colors", isSelected && "bg-primary/5")}>
+                      <td className="w-10 px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelectRow(c.id)}
+                          className="rounded border-border"
+                        />
+                      </td>
+
+                      {/* Contact Name + Avatar */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white shrink-0" style={{ backgroundColor: c.color }}>
+                            {c.initials}
+                          </div>
+                          <span className="font-bold text-foreground text-xs">{c.name}</span>
                         </div>
-                        <div>
-                          <p className="font-bold text-foreground text-xs group-hover:text-primary transition-colors">{contact.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{contact.city}, {contact.state}</p>
+                      </td>
+
+                      {/* Phone */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5 text-foreground font-semibold">
+                          <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <span>{c.phone}</span>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Type Badge */}
-                    <td className="p-3.5">
-                      <span className={cn(
-                        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold",
-                        contact.type === "Seller" ? "bg-amber-100 text-amber-700" :
-                        contact.type === "Cash Buyer" ? "bg-emerald-100 text-emerald-700" :
-                        contact.type === "Lender/Title" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700",
-                      )}>
-                        {contact.type}
-                      </span>
-                    </td>
+                      {/* Email */}
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {c.email !== "-" ? c.email : ""}
+                      </td>
 
-                    {/* Contact Details */}
-                    <td className="p-3.5 space-y-0.5">
-                      <p className="text-muted-foreground text-[11px] font-medium">{contact.email}</p>
-                      <p className="text-foreground text-[11px] font-semibold">{contact.phone}</p>
-                    </td>
+                      {/* Business Name */}
+                      <td className="px-4 py-3 font-medium text-foreground">
+                        {c.businessName || ""}
+                      </td>
 
-                    {/* Buy Box / Company */}
-                    <td className="p-3.5 max-w-xs">
-                      {contact.companyName && <p className="font-bold text-foreground text-[11px]">{contact.companyName}</p>}
-                      {contact.preferredMarkets && (
-                        <p className="text-[10px] text-muted-foreground truncate" title={contact.preferredMarkets}>
-                          {contact.preferredMarkets}
-                        </p>
-                      )}
-                      {contact.buyBoxMax && (
-                        <p className="text-[10px] font-bold text-emerald-600">Max Budget: ${contact.buyBoxMax.toLocaleString()}</p>
-                      )}
-                      {!contact.companyName && !contact.buyBoxMax && <span className="text-muted-foreground text-[11px]">—</span>}
-                    </td>
+                      {/* Created Date */}
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-[11px]">
+                        {c.createdDate}
+                      </td>
 
-                    {/* Deals count */}
-                    <td className="p-3.5">
-                      <span className="font-bold text-foreground">{contact.dealsCount}</span>
-                      <span className="text-[10px] text-muted-foreground ml-1">deals</span>
-                    </td>
+                      {/* Last Activity */}
+                      <td className="px-4 py-3">
+                        {c.lastActivity && (
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span>{c.lastActivity}</span>
+                          </div>
+                        )}
+                      </td>
 
-                    {/* Tags */}
-                    <td className="p-3.5">
-                      <div className="flex flex-wrap gap-1">
-                        {contact.tags.map(tag => (
-                          <span key={tag} className="rounded-md bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-muted-foreground">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="p-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => showToast(`Calling ${contact.name}...`)} className="rounded-lg border border-border p-1.5 text-muted-foreground hover:bg-primary hover:text-white transition" title="Call">
-                          <Phone className="h-3.5 w-3.5" />
-                        </button>
-                        <button onClick={() => showToast(`Sending SMS to ${contact.name}...`)} className="rounded-lg border border-border p-1.5 text-muted-foreground hover:bg-primary hover:text-white transition" title="Send SMS">
-                          <Mail className="h-3.5 w-3.5" />
-                        </button>
-                        <button onClick={() => setSelectedContact(contact)} className="rounded-lg border border-border p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition" title="View Full Details">
-                          <Eye className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      {/* Tags */}
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {c.tags.map(tag => (
+                            <span key={tag} className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
 
-      {/* ── Contact Detail Drawer ────────────────────────────────────── */}
-      {selectedContact && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-card border-l border-border h-full p-6 space-y-6 overflow-y-auto animate-in slide-in-from-right duration-300">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <h3 className="text-base font-bold text-foreground">Contact Profile</h3>
-              <button onClick={() => setSelectedContact(null)} className="rounded-lg p-1 hover:bg-accent"><X className="h-4 w-4" /></button>
+          {/* Footer Pagination Bar (Matches image exact pagination) */}
+          <div className="flex items-center justify-between border-t border-border bg-card px-6 py-3 text-xs text-muted-foreground">
+            <div>
+              Page <span className="font-bold text-foreground">{currentPage}</span> of <span className="font-bold text-foreground">426</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full text-base font-bold text-white shadow-md" style={{ backgroundColor: selectedContact.color }}>
-                {selectedContact.initials}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={pageSize}
+                  onChange={e => setPageSize(Number(e.target.value))}
+                  className="h-8 rounded-lg border border-border bg-background px-2 text-xs font-semibold text-foreground outline-none"
+                >
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-foreground">{selectedContact.name}</h2>
-                <p className="text-xs text-muted-foreground">{selectedContact.companyName || selectedContact.type}</p>
-                <span className="mt-1 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">{selectedContact.status}</span>
-              </div>
-            </div>
 
-            <div className="space-y-3 border-t border-border pt-4 text-xs">
-              <div>
-                <p className="text-[10px] font-semibold uppercase text-muted-foreground">Email</p>
-                <p className="font-semibold text-foreground">{selectedContact.email}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase text-muted-foreground">Phone</p>
-                <p className="font-semibold text-foreground">{selectedContact.phone}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase text-muted-foreground">Location</p>
-                <p className="font-semibold text-foreground">{selectedContact.city}, {selectedContact.state}</p>
-              </div>
-              {selectedContact.buyBoxMax && (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-500/10 p-3">
-                  <p className="text-[10px] font-bold uppercase text-emerald-700">Cash Buy Box Budget</p>
-                  <p className="text-base font-extrabold text-emerald-600">${selectedContact.buyBoxMax.toLocaleString()}</p>
-                  <p className="text-[10px] text-muted-foreground mt-1">{selectedContact.preferredMarkets}</p>
-                </div>
-              )}
-            </div>
+              <div className="flex items-center gap-1">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  className="rounded-lg border border-border px-3 py-1.5 font-semibold hover:bg-accent disabled:opacity-40"
+                >
+                  Prev
+                </button>
 
-            <div className="border-t border-border pt-4">
-              <button onClick={() => setSelectedContact(null)} className="w-full rounded-xl bg-primary py-2.5 text-xs font-semibold text-white hover:bg-primary/90">
-                Close Profile
-              </button>
+                <button
+                  className="rounded-lg bg-primary px-3 py-1.5 font-bold text-white"
+                >
+                  1
+                </button>
+
+                <button
+                  onClick={() => setCurrentPage(p => p + 1)}
+                  className="rounded-lg border border-border px-3 py-1.5 font-semibold hover:bg-accent"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Add Contact Modal ────────────────────────────────────────── */}
+      {topTab === "customfields" && (
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-foreground">Custom Contact Fields</h2>
+              <p className="text-xs text-muted-foreground">Define custom attributes for Real Estate Wholesaling (ARV, Repair Estimates, Buy Box parameters).</p>
+            </div>
+            <button onClick={() => showToast("Added new custom field")} className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white">
+              + Add Custom Field
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {CUSTOM_FIELDS.map(f => (
+              <div key={f.id} className="rounded-2xl border border-border bg-card p-5 space-y-2 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-foreground">{f.name}</h3>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">{f.type}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Placeholder: {f.placeholder}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Modals ─────────────────────────────────────────────────── */}
+      {/* Add Contact Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Add New Contact</h3>
+              <h3 className="text-base font-bold text-foreground">+ Add Contact</h3>
               <button onClick={() => setShowAddModal(false)} className="rounded-lg p-1 hover:bg-accent"><X className="h-4 w-4" /></button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Full Name</label>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Contact Name</label>
                 <input
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  placeholder="e.g. Marcus Vance"
+                  placeholder="e.g. Leigh Keller"
                   className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Contact Category</label>
-                  <select value={newType} onChange={e => setNewType(e.target.value as CrmContact["type"])} className="h-9 w-full rounded-xl border border-border bg-background px-2 text-xs outline-none focus:border-primary">
-                    <option value="Cash Buyer">Cash Buyer / Investor</option>
-                    <option value="Seller">Motivated Seller</option>
-                    <option value="Lender/Title">Title Company / Lender</option>
-                    <option value="Vendor/Contractor">Vendor / Contractor</option>
-                  </select>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Phone</label>
+                  <input
+                    value={newPhone}
+                    onChange={e => setNewPhone(e.target.value)}
+                    placeholder="(580) 713-9488"
+                    className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
+                  />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Company Name (Optional)</label>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Email</label>
                   <input
-                    value={newCompany}
-                    onChange={e => setNewCompany(e.target.value)}
-                    placeholder="Vance Capital LLC"
+                    value={newEmail}
+                    onChange={e => setNewEmail(e.target.value)}
+                    placeholder="leigh@gmail.com"
                     className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Email Address</label>
-                  <input
-                    value={newEmail}
-                    onChange={e => setNewEmail(e.target.value)}
-                    placeholder="marcus@vance.com"
-                    className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
-                  />
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Business Name</label>
+                <input
+                  value={newBusiness}
+                  onChange={e => setNewBusiness(e.target.value)}
+                  placeholder="Keller Property Group"
+                  className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
+                />
+              </div>
 
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Phone Number</label>
-                  <input
-                    value={newPhone}
-                    onChange={e => setNewPhone(e.target.value)}
-                    placeholder="(813) 555-0000"
-                    className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
-                  />
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Tag</label>
+                <input
+                  value={newTag}
+                  onChange={e => setNewTag(e.target.value)}
+                  placeholder="lawton"
+                  className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
+                />
               </div>
             </div>
 
