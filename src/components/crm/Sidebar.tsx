@@ -37,8 +37,14 @@ const nav: NavItem[] = [
       { icon: Mail,          label: "Email",              to: "/email" as const },
     ],
   },
-  { icon: CheckSquare,     label: "Tasks",           to: "/tasks" as const },
-  { icon: Calendar,        label: "Calendar",        to: "/calendar" as const },
+  {
+    icon: CheckSquare,
+    label: "Tasks & Calendar",
+    children: [
+      { icon: CheckSquare,  label: "All Tasks",         to: "/tasks" as const },
+      { icon: Calendar,     label: "Calendar Schedule", to: "/calendar" as const },
+    ],
+  },
   { icon: Contact,         label: "Contacts",        to: null },
   { icon: Home,            label: "Properties",      to: null },
   { icon: Megaphone,       label: "Campaigns",       to: null },
@@ -53,9 +59,17 @@ export function Sidebar() {
   const pathname = routerState.location.pathname;
   const { isOpen, close } = useSidebar();
 
-  // Conversations dropdown state (auto-expanded if current route is inside conversations)
   const isInsideConversations = ["/communications", "/calls", "/sms", "/email"].includes(pathname);
-  const [conversationsExpanded, setConversationsExpanded] = useState(isInsideConversations);
+  const isInsideTasks = ["/tasks", "/calendar"].includes(pathname);
+
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    Conversations: isInsideConversations,
+    "Tasks & Calendar": isInsideTasks,
+  });
+
+  const toggleGroup = (label: string) => {
+    setExpandedGroups(prev => ({ ...prev, [label]: !prev[label] }));
+  };
 
   const sidebarContent = (
     <aside className="flex h-full w-64 flex-col bg-sidebar text-sidebar-foreground">
@@ -74,18 +88,18 @@ export function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
         {nav.map((item) => {
-          // If item has children (like Conversations group)
+          // Group parent
           if (item.children) {
+            const isExpanded = !!expandedGroups[item.label];
             const hasActiveChild = item.children.some(child => child.to !== null && pathname === child.to);
 
             return (
               <div key={item.label} className="space-y-1">
-                {/* Group Parent Button */}
                 <button
-                  onClick={() => setConversationsExpanded(!conversationsExpanded)}
+                  onClick={() => toggleGroup(item.label)}
                   className={cn(
                     "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors select-none",
-                    hasActiveChild || conversationsExpanded
+                    hasActiveChild || isExpanded
                       ? "text-white bg-sidebar-accent/60"
                       : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-white",
                   )}
@@ -94,7 +108,7 @@ export function Sidebar() {
                     <item.icon className="h-4 w-4 shrink-0 text-primary" />
                     <span>{item.label}</span>
                   </div>
-                  {conversationsExpanded ? (
+                  {isExpanded ? (
                     <ChevronDown className="h-4 w-4 shrink-0 opacity-70" />
                   ) : (
                     <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
@@ -102,7 +116,7 @@ export function Sidebar() {
                 </button>
 
                 {/* Sub-items */}
-                {conversationsExpanded && (
+                {isExpanded && (
                   <div className="ml-3 pl-3 border-l border-sidebar-border/40 space-y-1 my-1">
                     {item.children.map(sub => {
                       const isSubActive = sub.to !== null && pathname === sub.to;

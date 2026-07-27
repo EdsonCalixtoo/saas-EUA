@@ -19,7 +19,7 @@ function CalendarRoute() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar />
-        <TasksPage />
+        <TasksPage defaultViewMode="calendar" />
       </div>
     </div>
   );

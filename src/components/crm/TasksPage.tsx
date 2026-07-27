@@ -139,9 +139,9 @@ const TYPE_CONFIG: Record<TaskType, { label: string; icon: any; bg: string; text
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export function TasksPage() {
+export function TasksPage({ defaultViewMode = "list" }: { defaultViewMode?: ViewMode }) {
   const [tasks, setTasks]                 = useState<CrmTask[]>(MOCK_TASKS);
-  const [viewMode, setViewMode]           = useState<ViewMode>("list");
+  const [viewMode, setViewMode]           = useState<ViewMode>(defaultViewMode);
   const [search, setSearch]               = useState("");
   const [statusFilter, setStatusFilter]   = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
