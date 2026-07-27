@@ -10,16 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as CallsRouteImport } from './routes/calls'
 import { Route as CommunicationsRouteImport } from './routes/communications'
 import { Route as EmailRouteImport } from './routes/email'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as SmsRouteImport } from './routes/sms'
+import { Route as TasksRouteImport } from './routes/tasks'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarRoute = CalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CallsRoute = CallsRouteImport.update({
@@ -52,73 +59,92 @@ const SmsRoute = SmsRouteImport.update({
   path: '/sms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
   '/sms': typeof SmsRoute
+  '/tasks': typeof TasksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
   '/sms': typeof SmsRoute
+  '/tasks': typeof TasksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
   '/sms': typeof SmsRoute
+  '/tasks': typeof TasksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/calendar'
     | '/calls'
     | '/communications'
     | '/email'
     | '/leads'
     | '/pipeline'
     | '/sms'
+    | '/tasks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/calendar'
     | '/calls'
     | '/communications'
     | '/email'
     | '/leads'
     | '/pipeline'
     | '/sms'
+    | '/tasks'
   id:
     | '__root__'
     | '/'
+    | '/calendar'
     | '/calls'
     | '/communications'
     | '/email'
     | '/leads'
     | '/pipeline'
     | '/sms'
+    | '/tasks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CalendarRoute: typeof CalendarRoute
   CallsRoute: typeof CallsRoute
   CommunicationsRoute: typeof CommunicationsRoute
   EmailRoute: typeof EmailRoute
   LeadsRoute: typeof LeadsRoute
   PipelineRoute: typeof PipelineRoute
   SmsRoute: typeof SmsRoute
+  TasksRoute: typeof TasksRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -128,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar': {
+      id: '/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calls': {
@@ -172,17 +205,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SmsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalendarRoute: CalendarRoute,
   CallsRoute: CallsRoute,
   CommunicationsRoute: CommunicationsRoute,
   EmailRoute: EmailRoute,
   LeadsRoute: LeadsRoute,
   PipelineRoute: PipelineRoute,
   SmsRoute: SmsRoute,
+  TasksRoute: TasksRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
