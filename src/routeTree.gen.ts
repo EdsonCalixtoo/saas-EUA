@@ -21,6 +21,7 @@ import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as SmsRouteImport } from './routes/sms'
 import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as TitleCompaniesRouteImport } from './routes/title-companies'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const TasksRoute = TasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TitleCompaniesRoute = TitleCompaniesRouteImport.update({
+  id: '/title-companies',
+  path: '/title-companies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
+  '/title-companies': typeof TitleCompaniesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
+  '/title-companies': typeof TitleCompaniesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
+  '/title-companies': typeof TitleCompaniesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/sms'
     | '/tasks'
+    | '/title-companies'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/sms'
     | '/tasks'
+    | '/title-companies'
   id:
     | '__root__'
     | '/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/sms'
     | '/tasks'
+    | '/title-companies'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   PropertiesRoute: typeof PropertiesRoute
   SmsRoute: typeof SmsRoute
   TasksRoute: typeof TasksRoute
+  TitleCompaniesRoute: typeof TitleCompaniesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/title-companies': {
+      id: '/title-companies'
+      path: '/title-companies'
+      fullPath: '/title-companies'
+      preLoaderRoute: typeof TitleCompaniesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   PropertiesRoute: PropertiesRoute,
   SmsRoute: SmsRoute,
   TasksRoute: TasksRoute,
+  TitleCompaniesRoute: TitleCompaniesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

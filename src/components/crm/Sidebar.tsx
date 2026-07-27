@@ -63,7 +63,7 @@ const nav: NavItem[] = [
   { icon: Calculator,      label: "Rehab Calc",      to: null },
   { icon: List,            label: "Buyer List",      to: null },
   { icon: TrendingUp,      label: "Kpi Tracker",     to: null },
-  { icon: Building,        label: "Title Companies", to: null },
+  { icon: Building,        label: "Title Companies", to: "/title-companies" as const },
   { icon: ShieldAlert,     label: "Vip Discord Access", to: null },
 ];
 
