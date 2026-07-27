@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+import { Image } from "@/components/ui/image"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -68,7 +68,7 @@ export function LeadDetailDialog({
             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">
               Estágio Atual no Pipeline
             </label>
-            <Select value={lead.status} onValueChange={(val) => handleStatusChange(val as Lead["status"])}>
+            <Select value={lead.status} onValueChange={(val: string) => handleStatusChange(val as Lead["status"])}>
               <SelectTrigger className="rounded-xl h-10 font-semibold">
                 <SelectValue />
               </SelectTrigger>

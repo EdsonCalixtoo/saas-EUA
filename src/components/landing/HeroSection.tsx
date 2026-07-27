@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Link } from "@tanstack/react-router"
-import Image from "next/image"
+import { Image } from "@/components/ui/image"
 import { motion } from "framer-motion"
 import {
   Search,

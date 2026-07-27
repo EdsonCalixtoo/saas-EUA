@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+import { Image } from "@/components/ui/image"
 import { Lead } from "@/lib/mock-data/crm"
 import { cn } from "@/lib/utils"
 

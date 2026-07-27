@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+import { Image } from "@/components/ui/image"
 import { Phone, Mic, MicOff, Grid, PhoneOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialerContact } from "@/lib/mock-data/dialer"

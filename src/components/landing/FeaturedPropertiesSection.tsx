@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
-import Link from "next/link"
+import { Image } from "@/components/ui/image"
+import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { Heart, Share2, MapPin, Bed, Bath, Car, Maximize, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -50,7 +50,7 @@ export function FeaturedPropertiesSection() {
             </p>
           </div>
 
-          <Link href="/properties">
+          <Link to="/properties">
             <Button className="bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-white dark:text-slate-900 font-bold rounded-2xl h-11 px-6 gap-2">
               <span>Ver Todos os Imóveis</span>
               <ArrowRight className="h-4 w-4" />

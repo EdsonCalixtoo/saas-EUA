@@ -37,7 +37,7 @@ export function LandingNavbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link to="/" className="flex items-center gap-3 group">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
             <Building2 className="h-5 w-5" />
           </div>
@@ -66,7 +66,7 @@ export function LandingNavbar() {
 
         {/* Desktop CTAs */}
         <div className="hidden sm:flex items-center gap-3">
-          <Link href="/dashboard">
+          <Link to="/login">
             <Button
               variant="ghost"
               className="font-bold text-sm text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-4"
@@ -75,7 +75,7 @@ export function LandingNavbar() {
             </Button>
           </Link>
 
-          <Link href="/dashboard">
+          <Link to="/">
             <Button className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm px-5 h-11 rounded-2xl shadow-md shadow-indigo-500/25 transition-all duration-200 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2">
               <span>Começar Gratuitamente</span>
               <ArrowRight className="h-4 w-4" />
@@ -117,12 +117,12 @@ export function LandingNavbar() {
               </div>
 
               <div className="flex flex-col gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
-                <Link href="/dashboard" className="w-full">
+                <Link to="/login" className="w-full">
                   <Button variant="outline" className="w-full h-11 rounded-xl font-bold">
                     Entrar
                   </Button>
                 </Link>
-                <Link href="/dashboard" className="w-full">
+                <Link to="/" className="w-full">
                   <Button className="w-full h-11 rounded-xl bg-indigo-600 text-white font-bold">
                     Começar Gratuitamente
                   </Button>

@@ -62,12 +62,11 @@ export function LandingFooter() {
 
           {/* Quick Links 2 */}
           <div className="flex flex-col gap-3">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Recursos SaaS</h4>
-            <Link href="/crm" className="text-xs hover:text-white transition-colors">CRM de Vendas</Link>
-            <Link href="/dialer" className="text-xs hover:text-white transition-colors">Power Dialer</Link>
-            <Link href="/sms" className="text-xs hover:text-white transition-colors">SMS Marketing</Link>
-            <Link href="/emails" className="text-xs hover:text-white transition-colors">Email Marketing</Link>
-            <Link href="/analytics" className="text-xs hover:text-white transition-colors">Analytics & Relatórios</Link>
+            <Link to="/pipeline" className="text-xs hover:text-white transition-colors">CRM de Vendas</Link>
+            <Link to="/calls" className="text-xs hover:text-white transition-colors">Power Dialer</Link>
+            <Link to="/sms" className="text-xs hover:text-white transition-colors">SMS Marketing</Link>
+            <Link to="/email" className="text-xs hover:text-white transition-colors">Email Marketing</Link>
+            <Link to="/" className="text-xs hover:text-white transition-colors">Analytics & Relatórios</Link>
           </div>
 
           {/* Contact & Social */}

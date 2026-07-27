@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+import { Image } from "@/components/ui/image"
 import { motion } from "framer-motion"
 import { Star, Quote } from "lucide-react"
 import { testimonialsData } from "@/lib/mock-data/landing"
