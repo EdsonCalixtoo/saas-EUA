@@ -60,7 +60,7 @@ const nav: NavItem[] = [
   { icon: Star,            label: "Reputation",      to: null },
   { icon: BarChart3,       label: "Reporting",       to: null },
   { icon: LayoutGrid,      label: "App Marketplace", to: null },
-  { icon: Calculator,      label: "Rehab Calc",      to: null },
+  { icon: Calculator,      label: "Rehab Calc",      to: "/rehab-calc" as const },
   { icon: List,            label: "Buyer List",      to: "/buyer-list" as const },
   { icon: TrendingUp,      label: "Kpi Tracker",     to: "/kpi-tracker" as const },
   { icon: Building,        label: "Title Companies", to: "/title-companies" as const },

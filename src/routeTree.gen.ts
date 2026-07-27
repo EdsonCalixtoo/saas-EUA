@@ -23,6 +23,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as PropertiesRouteImport } from './routes/properties'
+import { Route as RehabCalcRouteImport } from './routes/rehab-calc'
 import { Route as SmsRouteImport } from './routes/sms'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as TitleCompaniesRouteImport } from './routes/title-companies'
@@ -97,6 +98,11 @@ const PropertiesRoute = PropertiesRouteImport.update({
   path: '/properties',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RehabCalcRoute = RehabCalcRouteImport.update({
+  id: '/rehab-calc',
+  path: '/rehab-calc',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SmsRoute = SmsRouteImport.update({
   id: '/sms',
   path: '/sms',
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
+  '/rehab-calc': typeof RehabCalcRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
   '/title-companies': typeof TitleCompaniesRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
+  '/rehab-calc': typeof RehabCalcRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
   '/title-companies': typeof TitleCompaniesRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
+  '/rehab-calc': typeof RehabCalcRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
   '/title-companies': typeof TitleCompaniesRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/pipeline'
     | '/properties'
+    | '/rehab-calc'
     | '/sms'
     | '/tasks'
     | '/title-companies'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/pipeline'
     | '/properties'
+    | '/rehab-calc'
     | '/sms'
     | '/tasks'
     | '/title-companies'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/pipeline'
     | '/properties'
+    | '/rehab-calc'
     | '/sms'
     | '/tasks'
     | '/title-companies'
@@ -246,6 +258,7 @@ export interface RootRouteChildren {
   PaymentsRoute: typeof PaymentsRoute
   PipelineRoute: typeof PipelineRoute
   PropertiesRoute: typeof PropertiesRoute
+  RehabCalcRoute: typeof RehabCalcRoute
   SmsRoute: typeof SmsRoute
   TasksRoute: typeof TasksRoute
   TitleCompaniesRoute: typeof TitleCompaniesRoute
@@ -351,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rehab-calc': {
+      id: '/rehab-calc'
+      path: '/rehab-calc'
+      fullPath: '/rehab-calc'
+      preLoaderRoute: typeof RehabCalcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sms': {
       id: '/sms'
       path: '/sms'
@@ -390,6 +410,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentsRoute: PaymentsRoute,
   PipelineRoute: PipelineRoute,
   PropertiesRoute: PropertiesRoute,
+  RehabCalcRoute: RehabCalcRoute,
   SmsRoute: SmsRoute,
   TasksRoute: TasksRoute,
   TitleCompaniesRoute: TitleCompaniesRoute,
