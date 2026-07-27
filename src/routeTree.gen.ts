@@ -14,6 +14,7 @@ import { Route as CallsRouteImport } from './routes/calls'
 import { Route as CommunicationsRouteImport } from './routes/communications'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as PipelineRouteImport } from './routes/pipeline'
+import { Route as SmsRouteImport } from './routes/sms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const PipelineRoute = PipelineRouteImport.update({
   path: '/pipeline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SmsRoute = SmsRouteImport.update({
+  id: '/sms',
+  path: '/sms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/communications': typeof CommunicationsRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
+  '/sms': typeof SmsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/communications': typeof CommunicationsRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
+  '/sms': typeof SmsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,22 @@ export interface FileRoutesById {
   '/communications': typeof CommunicationsRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
+  '/sms': typeof SmsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calls' | '/communications' | '/leads' | '/pipeline'
+  fullPaths:
+    '/' | '/calls' | '/communications' | '/leads' | '/pipeline' | '/sms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calls' | '/communications' | '/leads' | '/pipeline'
-  id: '__root__' | '/' | '/calls' | '/communications' | '/leads' | '/pipeline'
+  to: '/' | '/calls' | '/communications' | '/leads' | '/pipeline' | '/sms'
+  id:
+    | '__root__'
+    | '/'
+    | '/calls'
+    | '/communications'
+    | '/leads'
+    | '/pipeline'
+    | '/sms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +94,7 @@ export interface RootRouteChildren {
   CommunicationsRoute: typeof CommunicationsRoute
   LeadsRoute: typeof LeadsRoute
   PipelineRoute: typeof PipelineRoute
+  SmsRoute: typeof SmsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PipelineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sms': {
+      id: '/sms'
+      path: '/sms'
+      fullPath: '/sms'
+      preLoaderRoute: typeof SmsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunicationsRoute: CommunicationsRoute,
   LeadsRoute: LeadsRoute,
   PipelineRoute: PipelineRoute,
+  SmsRoute: SmsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -14,7 +14,7 @@ const nav = [
   { icon: GitBranch,       label: "Pipeline",        to: "/pipeline" as const },
   { icon: MessageSquare,   label: "Communications",  to: "/communications" as const },
   { icon: Phone,           label: "Calls",           to: "/calls" as const },
-  { icon: MessageCircle,   label: "SMS",             to: null },
+  { icon: MessageCircle,   label: "SMS",             to: "/sms" as const },
   { icon: Mail,            label: "Email",           to: null },
   { icon: CheckSquare,     label: "Tasks",           to: null },
   { icon: Calendar,        label: "Calendar",        to: null },
