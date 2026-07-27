@@ -354,25 +354,48 @@ export function ContactsPage() {
                         <Check className="h-3 w-3 stroke-[3]" />
                       </button>
                     </th>
-                    <th className="px-3 py-3 text-left w-56 cursor-pointer hover:text-foreground select-none" onClick={() => handleSort("name")}>
-                      Contact name <SortIcon field="name" />
+                    <th className="px-3 py-3 text-left w-56 cursor-pointer hover:text-foreground select-none group" onClick={() => handleSort("name")}>
+                      <div className="flex items-center justify-between">
+                        <span>Contact name</span>
+                        <SortIcon field="name" />
+                      </div>
                     </th>
-                    <th className="px-3 py-3 text-left w-36 cursor-pointer hover:text-foreground select-none" onClick={() => handleSort("phone")}>
-                      Phone <SortIcon field="phone" />
+                    <th className="px-3 py-3 text-left w-36 cursor-pointer hover:text-foreground select-none group" onClick={() => handleSort("phone")}>
+                      <div className="flex items-center justify-between">
+                        <span>Phone</span>
+                        <SortIcon field="phone" />
+                      </div>
                     </th>
-                    <th className="px-3 py-3 text-left w-44 cursor-pointer hover:text-foreground select-none" onClick={() => handleSort("email")}>
-                      Email <SortIcon field="email" />
+                    <th className="px-3 py-3 text-left w-44 cursor-pointer hover:text-foreground select-none group" onClick={() => handleSort("email")}>
+                      <div className="flex items-center justify-between">
+                        <span>Email</span>
+                        <SortIcon field="email" />
+                      </div>
                     </th>
-                    <th className="px-3 py-3 text-left flex-1 cursor-pointer hover:text-foreground select-none" onClick={() => handleSort("businessName")}>
-                      Business name <SortIcon field="businessName" />
+                    <th className="px-3 py-3 text-left flex-1 cursor-pointer hover:text-foreground select-none group" onClick={() => handleSort("businessName")}>
+                      <div className="flex items-center justify-between">
+                        <span>Business name</span>
+                        <SortIcon field="businessName" />
+                      </div>
                     </th>
-                    <th className="px-3 py-3 text-left w-36 cursor-pointer hover:text-foreground select-none" onClick={() => handleSort("createdAt")}>
-                      Created <SortIcon field="createdAt" />
+                    <th className="px-3 py-3 text-left w-36 cursor-pointer hover:text-foreground select-none group" onClick={() => handleSort("createdAt")}>
+                      <div className="flex items-center justify-between">
+                        <span>Created (PDT)</span>
+                        <SortIcon field="createdAt" />
+                      </div>
                     </th>
-                    <th className="px-3 py-3 text-left w-36 cursor-pointer hover:text-foreground select-none" onClick={() => handleSort("lastActivity")}>
-                      Last activity <SortIcon field="lastActivity" />
+                    <th className="px-3 py-3 text-left w-40 cursor-pointer hover:text-foreground select-none group" onClick={() => handleSort("lastActivity")}>
+                      <div className="flex items-center justify-between">
+                        <span>Last activity (PDT)</span>
+                        <SortIcon field="lastActivity" />
+                      </div>
                     </th>
-                    <th className="px-3 py-3 text-left w-32">Tags</th>
+                    <th className="px-3 py-3 text-left w-32 cursor-pointer hover:text-foreground select-none group">
+                      <div className="flex items-center justify-between">
+                        <span>Tags</span>
+                        <ArrowUpDown className="ml-1 h-3 w-3 inline shrink-0 opacity-30" />
+                      </div>
+                    </th>
                     <th className="px-3 py-3 text-center w-14">·</th>
                   </tr>
                 </thead>
