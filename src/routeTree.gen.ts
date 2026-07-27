@@ -16,6 +16,7 @@ import { Route as CommunicationsRouteImport } from './routes/communications'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as EmailRouteImport } from './routes/email'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as KpiTrackerRouteImport } from './routes/kpi-tracker'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PaymentsRouteImport } from './routes/payments'
@@ -58,6 +59,11 @@ const EmailRoute = EmailRouteImport.update({
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiTrackerRoute = KpiTrackerRouteImport.update({
+  id: '/kpi-tracker',
+  path: '/kpi-tracker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeadsRoute = LeadsRouteImport.update({
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/home': typeof HomeRoute
+  '/kpi-tracker': typeof KpiTrackerRoute
   '/leads': typeof LeadsRoute
   '/login': typeof LoginRoute
   '/payments': typeof PaymentsRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/home': typeof HomeRoute
+  '/kpi-tracker': typeof KpiTrackerRoute
   '/leads': typeof LeadsRoute
   '/login': typeof LoginRoute
   '/payments': typeof PaymentsRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/home': typeof HomeRoute
+  '/kpi-tracker': typeof KpiTrackerRoute
   '/leads': typeof LeadsRoute
   '/login': typeof LoginRoute
   '/payments': typeof PaymentsRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/email'
     | '/home'
+    | '/kpi-tracker'
     | '/leads'
     | '/login'
     | '/payments'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/email'
     | '/home'
+    | '/kpi-tracker'
     | '/leads'
     | '/login'
     | '/payments'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/email'
     | '/home'
+    | '/kpi-tracker'
     | '/leads'
     | '/login'
     | '/payments'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   EmailRoute: typeof EmailRoute
   HomeRoute: typeof HomeRoute
+  KpiTrackerRoute: typeof KpiTrackerRoute
   LeadsRoute: typeof LeadsRoute
   LoginRoute: typeof LoginRoute
   PaymentsRoute: typeof PaymentsRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-tracker': {
+      id: '/kpi-tracker'
+      path: '/kpi-tracker'
+      fullPath: '/kpi-tracker'
+      preLoaderRoute: typeof KpiTrackerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leads': {
@@ -343,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRoute,
   EmailRoute: EmailRoute,
   HomeRoute: HomeRoute,
+  KpiTrackerRoute: KpiTrackerRoute,
   LeadsRoute: LeadsRoute,
   LoginRoute: LoginRoute,
   PaymentsRoute: PaymentsRoute,
