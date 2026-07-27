@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   Calculator,
   DollarSign,
@@ -18,11 +19,19 @@ import {
   ShieldCheck,
   RotateCcw,
   Sliders,
-  ChevronDown,
-  ChevronUp,
-  FileSpreadsheet,
-  Home,
+  Plus,
+  Trash2,
   Info,
+  BadgePercent,
+  CircleDollarSign,
+  PieChart as PieChartIcon,
+  Home,
+  Check,
+  Zap,
+  Flame,
+  ArrowUpRight,
+  ArrowDownRight,
+  Share2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,141 +42,201 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { toast } from "sonner"
 
 interface ScopeItem {
   id: string
   name: string
-  category: "Exterior" | "Interior" | "Cozinha & Banheiros" | "MEP & Estrutura" | "Outros"
-  cost: number
+  category: "Exterior" | "Interior" | "Cozinha & Banheiro" | "MEP & Elétrica" | "Estrutura & Licenças"
+  quantity: number
+  unitCost: number
+  enabled: boolean
 }
 
-const defaultItems: ScopeItem[] = [
-  { id: "roof", name: "Telhado & Calhas", category: "Exterior", cost: 8500 },
-  { id: "siding", name: "Pintura Externa & Facade", category: "Exterior", cost: 4200 },
-  { id: "windows", name: "Janelas (Substituição 8x)", category: "Exterior", cost: 3800 },
-  { id: "kitchen_cab", name: "Armários de Cozinha Shaker", category: "Cozinha & Banheiros", cost: 6500 },
-  { id: "kitchen_top", name: "Bancada de Quartzo", category: "Cozinha & Banheiros", cost: 3200 },
-  { id: "appliances", name: "Eletrodomésticos Inox", category: "Cozinha & Banheiros", cost: 2800 },
-  { id: "baths", name: "Reforma de 2 Banheiros", category: "Cozinha & Banheiros", cost: 7500 },
-  { id: "flooring", name: "Piso Vinílico LVP (1,800 sqft)", category: "Interior", cost: 5400 },
-  { id: "paint_int", name: "Pintura Interna Completa", category: "Interior", cost: 3600 },
-  { id: "hvac", name: "Novo Sistema de Ar HVAC", category: "MEP & Estrutura", cost: 6200 },
-  { id: "electrical", name: "Quadro Elétrico & Fiação", category: "MEP & Estrutura", cost: 3500 },
-  { id: "permits", name: "Licenças de Obra & Caçambas", category: "Outros", cost: 2200 },
+const initialItems: ScopeItem[] = [
+  { id: "roof", name: "Telhado Arquitetônico & Calhas", category: "Exterior", quantity: 1, unitCost: 8500, enabled: true },
+  { id: "siding", name: "Pintura Externa & Acabamento Facade", category: "Exterior", quantity: 1, unitCost: 4200, enabled: true },
+  { id: "windows", name: "Substituição de Janelas Impact-Resistant", category: "Exterior", quantity: 10, unitCost: 380, enabled: true },
+  { id: "kitchen_cab", name: "Armários de Cozinha Shaker Custom", category: "Cozinha & Banheiro", quantity: 1, unitCost: 6500, enabled: true },
+  { id: "kitchen_top", name: "Bancada de Quartzo Calacatta", category: "Cozinha & Banheiro", quantity: 1, unitCost: 3400, enabled: true },
+  { id: "appliances", name: "Kit Eletrodomésticos Inox Premium", category: "Cozinha & Banheiro", quantity: 1, unitCost: 3200, enabled: true },
+  { id: "baths", name: "Reforma Completa de 2 Banheiros", category: "Cozinha & Banheiro", quantity: 2, unitCost: 3800, enabled: true },
+  { id: "flooring", name: "Piso Vinílico LVP Waterproof", category: "Interior", quantity: 1800, unitCost: 3.2, enabled: true },
+  { id: "paint_int", name: "Pintura Interna Premium Neutra", category: "Interior", quantity: 1, unitCost: 3800, enabled: true },
+  { id: "hvac", name: "Sistema Central de Ar HVAC 3.5 Tons", category: "MEP & Elétrica", quantity: 1, unitCost: 6400, enabled: true },
+  { id: "electrical", name: "Quadro Elétrico 200A & Iluminação LED", category: "MEP & Elétrica", quantity: 1, unitCost: 3800, enabled: true },
+  { id: "plumbing", name: "Revisão Encanamento PVC/PEX", category: "MEP & Elétrica", quantity: 1, unitCost: 2900, enabled: true },
+  { id: "permits", name: "Licenças Municipais & Caçamba de Entulho", category: "Estrutura & Licenças", quantity: 1, unitCost: 2400, enabled: true },
 ]
 
 export function RehabCalcPage() {
-  // Main Deal Variables
+  const [activeTab, setActiveTab] = React.useState("calc")
+  
+  // Primary Parameters
+  const [propertyAddress, setPropertyAddress] = React.useState("742 Evergreen Terrace, Miami, FL")
   const [sqft, setSqft] = React.useState<number>(1800)
-  const [arv, setArv] = React.useState<number>(450000)
-  const [purchasePrice, setPurchasePrice] = React.useState<number>(265000)
-  const [targetRule, setTargetRule] = React.useState<number>(70) // 70% Rule
-  const [assignmentFee, setAssignmentFee] = React.useState<number>(15000)
+  const [arv, setArv] = React.useState<number>(480000)
+  const [purchasePrice, setPurchasePrice] = React.useState<number>(275000)
+  const [targetRule, setTargetRule] = React.useState<number>(70) // 70% rule
+  const [wholesaleFee, setWholesaleFee] = React.useState<number>(15000)
   const [holdingMonths, setHoldingMonths] = React.useState<number>(4)
-  const [monthlyHoldingCost, setMonthlyHoldingCost] = React.useState<number>(1200)
+  const [monthlyHolding, setMonthlyHolding] = React.useState<number>(1250)
   const [closingCosts, setClosingCosts] = React.useState<number>(8500)
-  const [contingencyPercent, setContingencyPercent] = React.useState<number>(10) // 10% contingency
+  const [contingencyPercent, setContingencyPercent] = React.useState<number>(10)
 
-  // Scope Items State
-  const [items, setItems] = React.useState<ScopeItem[]>(defaultItems)
-  const [rehabPreset, setRehabPreset] = React.useState<string>("custom")
+  // Rental BRRRR Assumptions
+  const [monthlyRent, setMonthlyRent] = React.useState<number>(3200)
+  const [propertyTaxAnnual, setPropertyTaxAnnual] = React.useState<number>(4200)
+  const [insuranceAnnual, setInsuranceAnnual] = React.useState<number>(1800)
 
-  // Calculate Base Rehab Cost from items sum
-  const baseRehabCost = items.reduce((acc, item) => acc + item.cost, 0)
-  const contingencyAmount = Math.round((baseRehabCost * contingencyPercent) / 100)
-  const totalRehabCost = baseRehabCost + contingencyAmount
+  // Scope Items
+  const [items, setItems] = React.useState<ScopeItem[]>(initialItems)
 
-  // Financial Formulas
-  // MAO = (ARV * (TargetRule / 100)) - TotalRehabCost - AssignmentFee
-  const mao = Math.round(arv * (targetRule / 100) - totalRehabCost - assignmentFee)
+  // Add Item State
+  const [newItemName, setNewItemName] = React.useState("")
+  const [newItemCategory, setNewItemCategory] = React.useState<ScopeItem["category"]>("Interior")
+  const [newItemCost, setNewItemCost] = React.useState<string>("")
 
-  const totalHoldingCost = holdingMonths * monthlyHoldingCost
-  const totalInvestment = purchasePrice + totalRehabCost + closingCosts + totalHoldingCost + assignmentFee
-  const projectedProfit = arv - totalInvestment
-  const projectedRoi = totalInvestment > 0 ? ((projectedProfit / totalInvestment) * 100).toFixed(1) : "0"
+  // Calculations
+  const baseRehabSum = items
+    .filter((item) => item.enabled)
+    .reduce((acc, item) => acc + item.quantity * item.unitCost, 0)
+  
+  const contingencyAmount = Math.round((baseRehabSum * contingencyPercent) / 100)
+  const totalRehabCost = Math.round(baseRehabSum + contingencyAmount)
 
-  // Cost per SqFt
+  // MAO Formula: (ARV * (TargetRule / 100)) - TotalRehab - WholesaleFee
+  const mao = Math.round(arv * (targetRule / 100) - totalRehabCost - wholesaleFee)
+
+  const totalHoldingCost = holdingMonths * monthlyHolding
+  const totalCapitalRequired = purchasePrice + totalRehabCost + closingCosts + totalHoldingCost + wholesaleFee
+  const netProfit = arv - totalCapitalRequired
+  const roi = totalCapitalRequired > 0 ? ((netProfit / totalCapitalRequired) * 100).toFixed(1) : "0"
   const costPerSqft = sqft > 0 ? (totalRehabCost / sqft).toFixed(2) : "0"
 
-  // Handle Preset Quality Selection
+  // BRRRR Rental Calculations
+  const annualGrossRent = monthlyRent * 12
+  const totalAnnualOperatingExpenses = propertyTaxAnnual + insuranceAnnual + monthlyRent * 12 * 0.1 // 10% management/maintenance
+  const noi = annualGrossRent - totalAnnualOperatingExpenses
+  const capRate = arv > 0 ? ((noi / arv) * 100).toFixed(2) : "0"
+  const monthlyCashflow = Math.round((noi / 12) - 1450) // Assuming $1,450 mortgage
+
+  // Deal Score Calculation (0 to 100)
+  const dealScore = Math.min(
+    100,
+    Math.max(
+      0,
+      Math.round(
+        (purchasePrice <= mao ? 50 : 25) +
+        (Number(roi) > 20 ? 30 : Number(roi) > 10 ? 15 : 5) +
+        (netProfit > 40000 ? 20 : 10)
+      )
+    )
+  )
+
+  const toggleItem = (id: string) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, enabled: !item.enabled } : item))
+    )
+  }
+
+  const removeItem = (id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id))
+    toast.success("Item removido do escopo de reforma.")
+  }
+
+  const handleAddItem = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newItemName.trim() || !newItemCost.trim()) return
+
+    const costVal = parseFloat(newItemCost.replace(/[^0-9.]/g, "")) || 0
+    const newItem: ScopeItem = {
+      id: `item-${Date.now()}`,
+      name: newItemName,
+      category: newItemCategory,
+      quantity: 1,
+      unitCost: costVal,
+      enabled: true,
+    }
+
+    setItems([...items, newItem])
+    setNewItemName("")
+    setNewItemCost("")
+    toast.success(`Item "${newItemName}" adicionado ao escopo de reforma!`)
+  }
+
   const applyPreset = (preset: string) => {
-    setRehabPreset(preset)
     let rate = 30
     if (preset === "light") rate = 20
     if (preset === "medium") rate = 40
     if (preset === "heavy") rate = 70
 
-    if (preset !== "custom") {
-      const estimatedTotal = sqft * rate
-      const ratio = estimatedTotal / (baseRehabCost || 1)
-      setItems((prev) =>
-        prev.map((item) => ({
-          ...item,
-          cost: Math.round(item.cost * ratio),
-        }))
-      )
-      toast.success(`Orçamento atualizado para padrão ${preset.toUpperCase()} ($${rate}/sqft)`)
-    }
-  }
+    const targetTotal = sqft * rate
+    const ratio = targetTotal / (baseRehabSum || 1)
 
-  const handleItemCostChange = (id: string, newCost: number) => {
     setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, cost: Math.max(0, newCost) } : item))
+      prev.map((item) => ({
+        ...item,
+        unitCost: Math.round(item.unitCost * ratio * 100) / 100,
+      }))
     )
-    setRehabPreset("custom")
-  }
-
-  const handleExportPDF = () => {
-    toast.success("Relatório de Reforma Scope of Work exportado em PDF!")
+    toast.success(`Escopo ajustado para padrão ${preset.toUpperCase()} ($${rate}/sqft)`)
   }
 
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto">
-      {/* Header Bar */}
-      <div className="border-b border-border bg-card px-6 py-5 sticky top-0 z-10 shadow-xs">
+      {/* Header Bar with Glassmorphism */}
+      <div className="border-b border-border bg-card/80 backdrop-blur-md px-6 py-5 sticky top-0 z-20 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-emerald-600 text-white shadow-md shadow-indigo-500/20">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 text-white shadow-md shadow-emerald-500/20">
               <Calculator className="h-6 w-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold tracking-tight text-foreground">
-                  Calculadora de Reforma & Análise MAO (Rehab Calc)
+                <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+                  Rehab Calc & MAO Deal Analyzer
                 </h1>
-                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                  <Sparkles className="h-3 w-3" /> Regra dos 70% & ARV
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <Flame className="h-3.5 w-3.5" /> Score: {dealScore}/100
                 </span>
               </div>
               <p className="text-xs text-muted-foreground font-medium mt-0.5">
-                Simule o custo da reforma por m², determine a oferta máxima permitida (MAO) e projete o lucro líquido do investimento.
+                Simulador avançado de custos de obra, margem de segurança MAO 70% e comparativo Flip vs. Rental.
               </p>
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Header */}
           <div className="flex items-center gap-2">
             <Button
-              onClick={handleExportPDF}
+              onClick={() => toast.success("Relatório de Reforma exportado com sucesso!")}
               variant="outline"
-              className="h-9 rounded-xl font-semibold text-xs px-3.5 gap-1.5 border-border"
+              className="h-9 rounded-xl font-semibold text-xs px-3.5 gap-1.5 border-border hover:bg-muted"
             >
               <Download className="h-3.5 w-3.5" />
-              <span>Exportar PDF / Imprimir</span>
+              <span>Exportar Scope PDF</span>
+            </Button>
+            <Button
+              onClick={() => toast.success("Link do escopo compartilhado com a equipe!")}
+              className="h-9 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3.5 gap-1.5 shadow-sm shadow-emerald-600/20"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              <span>Compartlhar Proposta</span>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Main Grid Content */}
+      {/* Main Container */}
       <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
 
-        {/* Financial KPI Results Summary */}
+        {/* Hero KPI Summary Dashboard */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          {/* MAO Card */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-emerald-500/40 transition-all">
+          {/* Card 1: MAO Offer Target */}
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-emerald-500/50 transition-all">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Oferta Máxima (MAO 70%)
@@ -177,47 +246,47 @@ export function RehabCalcPage() {
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400">
+              <span className="text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-400">
                 ${mao.toLocaleString()}
               </span>
               <p className="text-xs text-muted-foreground font-medium mt-1">
-                Oferta sugerida para garantir o lucro.
+                Teto recomendado para garantir a margem.
               </p>
             </div>
             <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs">
               <span className="text-muted-foreground font-medium">Preço Proposto:</span>
               <span className={`font-bold ${purchasePrice <= mao ? "text-emerald-600" : "text-rose-500"}`}>
-                ${purchasePrice.toLocaleString()} {purchasePrice <= mao ? "✓ Aprovado" : "⚠ Acima do MAO"}
+                ${purchasePrice.toLocaleString()} {purchasePrice <= mao ? "✓ Lucrativo" : "⚠ Acima do Teto"}
               </span>
             </div>
           </div>
 
-          {/* Custo Total de Reforma Card */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-indigo-500/40 transition-all">
+          {/* Card 2: Total Rehab Budget */}
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-indigo-500/50 transition-all">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Orçamento de Reforma Total
+                Custo Total de Reforma
               </span>
               <div className="h-9 w-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
                 <Hammer className="h-5 w-5" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-extrabold tracking-tight text-foreground">
+              <span className="text-2xl font-black tracking-tight text-foreground">
                 ${totalRehabCost.toLocaleString()}
               </span>
               <p className="text-xs text-muted-foreground font-medium mt-1">
-                Estimativa: <span className="font-bold text-foreground">${costPerSqft}/sqft</span>
+                Custo por Área: <span className="font-bold text-indigo-600">${costPerSqft}/sqft</span>
               </p>
             </div>
             <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs">
-              <span className="text-muted-foreground font-medium">Margem Contingência (10%):</span>
+              <span className="text-muted-foreground font-medium">Contingência ({contingencyPercent}%):</span>
               <span className="font-bold text-indigo-600">${contingencyAmount.toLocaleString()}</span>
             </div>
           </div>
 
-          {/* Lucro Líquido Projetado */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/40 transition-all">
+          {/* Card 3: Projected Net Profit & ROI */}
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/50 transition-all">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Lucro Líquido Projetado
@@ -227,21 +296,21 @@ export function RehabCalcPage() {
               </div>
             </div>
             <div className="mt-3">
-              <span className={`text-2xl font-extrabold tracking-tight ${projectedProfit >= 30000 ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"}`}>
-                ${projectedProfit.toLocaleString()}
+              <span className={`text-2xl font-black tracking-tight ${netProfit >= 35000 ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"}`}>
+                ${netProfit.toLocaleString()}
               </span>
               <p className="text-xs text-muted-foreground font-medium mt-1">
-                Retorno sobre Investimento: <span className="font-bold text-purple-600">{projectedRoi}% ROI</span>
+                Retorno do Capital: <span className="font-bold text-purple-600">{roi}% ROI</span>
               </p>
             </div>
             <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs">
-              <span className="text-muted-foreground font-medium">Investimento Total:</span>
-              <span className="font-bold text-foreground">${totalInvestment.toLocaleString()}</span>
+              <span className="text-muted-foreground font-medium">Capital Total Exigido:</span>
+              <span className="font-bold text-foreground">${totalCapitalRequired.toLocaleString()}</span>
             </div>
           </div>
 
-          {/* ARV Expected Value */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-amber-500/40 transition-all">
+          {/* Card 4: ARV Expected Market Value */}
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:border-amber-500/50 transition-all">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Valor Pós-Reforma (ARV)
@@ -251,206 +320,455 @@ export function RehabCalcPage() {
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-extrabold tracking-tight text-foreground">
+              <span className="text-2xl font-black tracking-tight text-foreground">
                 ${arv.toLocaleString()}
               </span>
               <p className="text-xs text-muted-foreground font-medium mt-1">
-                Área Total: <span className="font-bold text-foreground">{sqft.toLocaleString()} sqft</span>
+                Metragem: <span className="font-bold text-foreground">{sqft.toLocaleString()} sqft</span>
               </p>
             </div>
             <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs">
-              <span className="text-muted-foreground font-medium">Taxa de Compra (MAO):</span>
+              <span className="text-muted-foreground font-medium">Desconto Alvo:</span>
               <span className="font-bold text-amber-600">{targetRule}% do ARV</span>
             </div>
           </div>
 
         </div>
 
-        {/* Core Inputs & Scope Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Interactive Tabs Navigation */}
+        <Tabs defaultValue="calc" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="bg-card border border-border p-1 rounded-2xl h-12 w-full justify-start gap-1">
+            <TabsTrigger value="calc" className="rounded-xl font-bold text-xs h-10 px-4 gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Sliders className="h-4 w-4" />
+              <span>Calculadora MAO & Parâmetros</span>
+            </TabsTrigger>
+            <TabsTrigger value="scope" className="rounded-xl font-bold text-xs h-10 px-4 gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Hammer className="h-4 w-4" />
+              <span>Escopo de Reforma por Item ({items.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="scenarios" className="rounded-xl font-bold text-xs h-10 px-4 gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <PieChartIcon className="h-4 w-4" />
+              <span>Comparativo Flip vs. BRRRR Rental</span>
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Left Column: Property & Deal Inputs */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-5">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="font-bold text-base text-foreground flex items-center gap-2">
-                <Sliders className="h-5 w-5 text-indigo-600" />
-                Parâmetros Financeiros do Imóvel
-              </h3>
-            </div>
+          {/* TAB 1: CALCULADORA MAO & PARÂMETROS */}
+          <TabsContent value="calc" className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <div className="space-y-4 text-xs">
-              {/* ARV */}
-              <div className="space-y-1.5">
-                <label className="font-semibold text-muted-foreground">Valor Pós-Reforma estimado (ARV $)</label>
-                <Input
-                  type="number"
-                  value={arv}
-                  onChange={(e) => setArv(Number(e.target.value))}
-                  className="rounded-xl h-10 font-extrabold text-sm"
-                />
-              </div>
-
-              {/* Purchase Price */}
-              <div className="space-y-1.5">
-                <label className="font-semibold text-muted-foreground">Preço de Compra Proposto ($)</label>
-                <Input
-                  type="number"
-                  value={purchasePrice}
-                  onChange={(e) => setPurchasePrice(Number(e.target.value))}
-                  className="rounded-xl h-10 font-bold"
-                />
-              </div>
-
-              {/* SqFt */}
-              <div className="space-y-1.5">
-                <label className="font-semibold text-muted-foreground">Área Total do Imóvel (Square Feet)</label>
-                <Input
-                  type="number"
-                  value={sqft}
-                  onChange={(e) => setSqft(Number(e.target.value))}
-                  className="rounded-xl h-10 font-medium"
-                />
-              </div>
-
-              {/* Target Rule Selector */}
-              <div className="space-y-1.5">
-                <label className="font-semibold text-muted-foreground">Regra de Desconto Alvo (Target Rule %)</label>
-                <Select value={targetRule.toString()} onValueChange={(val) => setTargetRule(Number(val))}>
-                  <SelectTrigger className="rounded-xl h-10 font-semibold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    <SelectItem value="70">Regra 70% (Investidor Padrão)</SelectItem>
-                    <SelectItem value="75">Regra 75% (Mercado de Alta Demanda)</SelectItem>
-                    <SelectItem value="65">Regra 65% (Conservador / Alto Risco)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Assignment Fee */}
-              <div className="space-y-1.5">
-                <label className="font-semibold text-muted-foreground">Taxa de Atribuição / Wholesale Fee ($)</label>
-                <Input
-                  type="number"
-                  value={assignmentFee}
-                  onChange={(e) => setAssignmentFee(Number(e.target.value))}
-                  className="rounded-xl h-10 font-medium"
-                />
-              </div>
-
-              {/* Holding Costs */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="font-semibold text-muted-foreground">Meses de Obra/Holding</label>
-                  <Input
-                    type="number"
-                    value={holdingMonths}
-                    onChange={(e) => setHoldingMonths(Number(e.target.value))}
-                    className="rounded-xl h-10"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-semibold text-muted-foreground">Custo Mensal ($)</label>
-                  <Input
-                    type="number"
-                    value={monthlyHoldingCost}
-                    onChange={(e) => setMonthlyHoldingCost(Number(e.target.value))}
-                    className="rounded-xl h-10"
-                  />
-                </div>
-              </div>
-
-              {/* Closing Costs */}
-              <div className="space-y-1.5">
-                <label className="font-semibold text-muted-foreground">Custos de Fechamento / Cartório ($)</label>
-                <Input
-                  type="number"
-                  value={closingCosts}
-                  onChange={(e) => setClosingCosts(Number(e.target.value))}
-                  className="rounded-xl h-10 font-medium"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Right Columns: Scope of Work Line Items */}
-          <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col justify-between space-y-5">
-            <div>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
-                <div>
+              {/* Parâmetros do Imóvel */}
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-5">
+                <div className="flex items-center justify-between border-b border-border pb-3">
                   <h3 className="font-bold text-base text-foreground flex items-center gap-2">
-                    <Hammer className="h-5 w-5 text-emerald-600" />
-                    Escopo Detalhado da Reforma (Scope of Work)
+                    <Home className="h-5 w-5 text-indigo-600" />
+                    Dados Básicos do Imóvel
                   </h3>
-                  <p className="text-xs text-muted-foreground">Ajuste os valores por item ou selecione um perfil de acabamento pronto.</p>
                 </div>
 
-                {/* Preset Selector */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-muted-foreground">Preset:</span>
-                  <Select value={rehabPreset} onValueChange={applyPreset}>
-                    <SelectTrigger className="w-[160px] h-9 text-xs font-bold rounded-xl bg-background border-border">
-                      <SelectValue placeholder="Preset Reforma" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      <SelectItem value="light">Cosmética ($20/sqft)</SelectItem>
-                      <SelectItem value="medium">Média ($40/sqft)</SelectItem>
-                      <SelectItem value="heavy">Pesada ($70/sqft)</SelectItem>
-                      <SelectItem value="custom">Personalizado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-4 text-xs">
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Endereço do Imóvel</label>
+                    <Input
+                      value={propertyAddress}
+                      onChange={(e) => setPropertyAddress(e.target.value)}
+                      className="rounded-xl h-10 font-medium"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Valor Pós-Reforma Estimado (ARV $)</label>
+                    <Input
+                      type="number"
+                      value={arv}
+                      onChange={(e) => setArv(Number(e.target.value))}
+                      className="rounded-xl h-10 font-extrabold text-sm text-emerald-600 dark:text-emerald-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Preço de Oferta Proposto ($)</label>
+                    <Input
+                      type="number"
+                      value={purchasePrice}
+                      onChange={(e) => setPurchasePrice(Number(e.target.value))}
+                      className="rounded-xl h-10 font-bold"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Área Útil do Imóvel (SqFt)</label>
+                    <Input
+                      type="number"
+                      value={sqft}
+                      onChange={(e) => setSqft(Number(e.target.value))}
+                      className="rounded-xl h-10 font-medium"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Regra de Desconto Alvo (Target Rule %)</label>
+                    <Select value={targetRule.toString()} onValueChange={(val) => setTargetRule(Number(val))}>
+                      <SelectTrigger className="rounded-xl h-10 font-semibold">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="70">Regra dos 70% (Padrão Investidor)</SelectItem>
+                        <SelectItem value="75">Regra dos 75% (Mercado Aquecido)</SelectItem>
+                        <SelectItem value="65">Regra dos 65% (Conservador)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
-              {/* Itemized Table */}
-              <div className="divide-y divide-border text-xs mt-4">
-                {items.map((item) => (
-                  <div key={item.id} className="py-3 flex items-center justify-between gap-4 hover:bg-muted/20 px-2 rounded-xl transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-xl bg-secondary flex items-center justify-center font-bold text-muted-foreground">
-                        <Layers className="h-4 w-4 text-indigo-500" />
-                      </div>
-                      <div>
-                        <span className="font-bold text-foreground block">{item.name}</span>
-                        <span className="text-[10px] text-muted-foreground font-semibold bg-secondary/80 px-2 py-0.5 rounded-md">
-                          {item.category}
-                        </span>
-                      </div>
-                    </div>
+              {/* Custos Operacionais & Holding */}
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-5">
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                  <h3 className="font-bold text-base text-foreground flex items-center gap-2">
+                    <CircleDollarSign className="h-5 w-5 text-emerald-600" />
+                    Custos Financeiros & Holding
+                  </h3>
+                </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-muted-foreground">$</span>
+                <div className="space-y-4 text-xs">
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Taxa de Atribuição (Wholesale Fee $)</label>
+                    <Input
+                      type="number"
+                      value={wholesaleFee}
+                      onChange={(e) => setWholesaleFee(Number(e.target.value))}
+                      className="rounded-xl h-10 font-bold"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="font-semibold text-muted-foreground">Meses de Holding</label>
                       <Input
                         type="number"
-                        value={item.cost}
-                        onChange={(e) => handleItemCostChange(item.id, Number(e.target.value))}
-                        className="w-32 h-9 rounded-xl font-bold text-right text-xs"
+                        value={holdingMonths}
+                        onChange={(e) => setHoldingMonths(Number(e.target.value))}
+                        className="rounded-xl h-10"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="font-semibold text-muted-foreground">Custo Mensal ($)</label>
+                      <Input
+                        type="number"
+                        value={monthlyHolding}
+                        onChange={(e) => setMonthlyHolding(Number(e.target.value))}
+                        className="rounded-xl h-10"
                       />
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Total Footer Summary */}
-            <div className="p-4 rounded-xl bg-muted/40 border border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <Info className="h-4 w-4 text-indigo-500 shrink-0" />
-                <span className="text-muted-foreground">
-                  Subtotal dos Itens: <strong className="text-foreground">${baseRehabCost.toLocaleString()}</strong> + 10% Reserva Contingência (${contingencyAmount.toLocaleString()})
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Custos de Fechamento / Escritura ($)</label>
+                    <Input
+                      type="number"
+                      value={closingCosts}
+                      onChange={(e) => setClosingCosts(Number(e.target.value))}
+                      className="rounded-xl h-10 font-medium"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-muted-foreground">Margem de Contingência de Obra (%)</label>
+                    <Select value={contingencyPercent.toString()} onValueChange={(val) => setContingencyPercent(Number(val))}>
+                      <SelectTrigger className="rounded-xl h-10 font-semibold">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="5">5% (Baixo Risco)</SelectItem>
+                        <SelectItem value="10">10% (Recomendado)</SelectItem>
+                        <SelectItem value="15">15% (Estrutura Antiga)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Resumo da Análise de Viabilidade */}
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col justify-between space-y-4">
+                <div>
+                  <h3 className="font-bold text-base text-foreground flex items-center gap-2 border-b border-border pb-3">
+                    <ShieldCheck className="h-5 w-5 text-purple-600" />
+                    Diagnóstico de Viabilidade do Negócio
+                  </h3>
+
+                  <div className="py-4 space-y-3 text-xs">
+                    <div className="flex justify-between items-center pb-2 border-b border-border">
+                      <span className="text-muted-foreground">Preço de Compra:</span>
+                      <span className="font-bold text-foreground">${purchasePrice.toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pb-2 border-b border-border">
+                      <span className="text-muted-foreground">Custo Total de Reforma:</span>
+                      <span className="font-bold text-indigo-600">${totalRehabCost.toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pb-2 border-b border-border">
+                      <span className="text-muted-foreground">Total de Holding & Cartório:</span>
+                      <span className="font-bold text-foreground">${(totalHoldingCost + closingCosts).toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pb-2 border-b border-border">
+                      <span className="text-muted-foreground">Teto da Oferta (MAO 70%):</span>
+                      <span className="font-extrabold text-emerald-600">${mao.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {/* Status Banner */}
+                  <div
+                    className={`p-4 rounded-xl border flex items-center gap-3 ${
+                      purchasePrice <= mao
+                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
+                        : "bg-rose-500/10 border-rose-500/20 text-rose-700 dark:text-rose-400"
+                    }`}
+                  >
+                    {purchasePrice <= mao ? (
+                      <CheckCircle2 className="h-6 w-6 shrink-0 text-emerald-600" />
+                    ) : (
+                      <AlertTriangle className="h-6 w-6 shrink-0 text-rose-600" />
+                    )}
+                    <div>
+                      <h4 className="font-bold text-xs">
+                        {purchasePrice <= mao ? "Compra Aprovada & Lucrativa!" : "Atenção: Preço Acima da Margem MAO"}
+                      </h4>
+                      <p className="text-[11px] opacity-90 mt-0.5">
+                        {purchasePrice <= mao
+                          ? `Oferta dentro do teto seguro. Projeção de lucro de $${netProfit.toLocaleString()} (${roi}% ROI).`
+                          : `Para manter a margem de 70%, renegocie o preço para no máximo $${mao.toLocaleString()}.`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => toast.success("Oferta gerada com os parâmetros do MAO!")}
+                  className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20"
+                >
+                  Gerar Carta de Oferta (LOI)
+                </Button>
+              </div>
+
+            </div>
+          </TabsContent>
+
+          {/* TAB 2: ESCOPO DE REFORMA POR ITEM */}
+          <TabsContent value="scope" className="mt-6 space-y-6">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-6">
+              
+              {/* Presets and Add Form Bar */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-border pb-5">
+                <div>
+                  <h3 className="font-bold text-base text-foreground flex items-center gap-2">
+                    <Hammer className="h-5 w-5 text-emerald-600" />
+                    Detalhamento dos Itens de Obra (Scope of Work)
+                  </h3>
+                  <p className="text-xs text-muted-foreground">Marque os itens inclusos na reforma para recalcular o custo total.</p>
+                </div>
+
+                {/* Preset Quality Buttons */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-muted-foreground">Qualidade:</span>
+                  <Button onClick={() => applyPreset("light")} variant="outline" size="sm" className="h-8 rounded-xl text-xs font-bold">
+                    Cosmética ($20/sqft)
+                  </Button>
+                  <Button onClick={() => applyPreset("medium")} variant="outline" size="sm" className="h-8 rounded-xl text-xs font-bold">
+                    Média ($40/sqft)
+                  </Button>
+                  <Button onClick={() => applyPreset("heavy")} variant="outline" size="sm" className="h-8 rounded-xl text-xs font-bold">
+                    Pesada ($70/sqft)
+                  </Button>
+                </div>
+              </div>
+
+              {/* Form to Add Custom Item */}
+              <form onSubmit={handleAddItem} className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-muted/30 p-4 rounded-xl border border-border">
+                <Input
+                  placeholder="Nome do Item (Ex: Kit Spots LED)"
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                  className="rounded-xl h-9 text-xs bg-background"
+                />
+                <Select value={newItemCategory} onValueChange={(val: any) => setNewItemCategory(val)}>
+                  <SelectTrigger className="rounded-xl h-9 text-xs bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="Exterior">Exterior</SelectItem>
+                    <SelectItem value="Interior">Interior</SelectItem>
+                    <SelectItem value="Cozinha & Banheiro">Cozinha & Banheiro</SelectItem>
+                    <SelectItem value="MEP & Elétrica">MEP & Elétrica</SelectItem>
+                    <SelectItem value="Estrutura & Licenças">Estrutura & Licenças</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="Custo Categoria ($)"
+                  value={newItemCost}
+                  onChange={(e) => setNewItemCost(e.target.value)}
+                  className="rounded-xl h-9 text-xs bg-background"
+                />
+                <Button type="submit" className="h-9 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs gap-1">
+                  <Plus className="h-4 w-4" />
+                  <span>Adicionar Item</span>
+                </Button>
+              </form>
+
+              {/* Items List Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/40 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <th className="py-3 px-4">Incluso</th>
+                      <th className="py-3 px-4">Descrição do Serviço / Item</th>
+                      <th className="py-3 px-4">Categoria</th>
+                      <th className="py-3 px-4 text-center">Qtd.</th>
+                      <th className="py-3 px-4 text-right">Custo Unitário ($)</th>
+                      <th className="py-3 px-4 text-right">Subtotal ($)</th>
+                      <th className="py-3 px-4 text-right">Remover</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border text-xs">
+                    {items.map((item) => (
+                      <tr key={item.id} className={`hover:bg-muted/30 transition-colors ${!item.enabled ? "opacity-40 bg-muted/20" : ""}`}>
+                        <td className="py-3 px-4">
+                          <input
+                            type="checkbox"
+                            checked={item.enabled}
+                            onChange={() => toggleItem(item.id)}
+                            className="h-4 w-4 rounded-md text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                          />
+                        </td>
+                        <td className="py-3 px-4 font-bold text-foreground">{item.name}</td>
+                        <td className="py-3 px-4">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-secondary text-muted-foreground">
+                            {item.category}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center font-semibold">{item.quantity}</td>
+                        <td className="py-3 px-4 text-right font-medium">${item.unitCost.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-right font-extrabold text-emerald-600">
+                          ${(item.quantity * item.unitCost).toLocaleString()}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Total Footer Banner */}
+              <div className="p-4 rounded-xl bg-card border border-border flex items-center justify-between text-xs">
+                <span className="font-semibold text-muted-foreground">
+                  Subtotal ({items.filter((i) => i.enabled).length} itens ativos): <strong className="text-foreground">${baseRehabSum.toLocaleString()}</strong> + 10% Contingência (${contingencyAmount.toLocaleString()})
+                </span>
+                <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                  Total Final: ${totalRehabCost.toLocaleString()}
                 </span>
               </div>
-              <div className="text-right">
-                <span className="text-muted-foreground block text-[10px]">Custo Total da Reforma:</span>
-                <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">
-                  ${totalRehabCost.toLocaleString()}
-                </span>
-              </div>
             </div>
+          </TabsContent>
 
-          </div>
+          {/* TAB 3: COMPARATIVO FLIP VS BRRRR RENTAL */}
+          <TabsContent value="scenarios" className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        </div>
+              {/* Strategy 1: Fix & Flip */}
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-5 relative overflow-hidden">
+                <div className="flex items-center justify-between border-b border-border pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
+                      <Flame className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base text-foreground">Estratégia Fix & Flip</h3>
+                      <p className="text-xs text-muted-foreground">Revenda rápida pós-reforma.</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-xl">
+                    Ganho Rápido
+                  </span>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Preço de Revenda (ARV):</span>
+                    <span className="font-bold text-foreground">${arv.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Investimento Total Exigido:</span>
+                    <span className="font-bold text-foreground">${totalCapitalRequired.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Tempo de Obra + Venda:</span>
+                    <span className="font-bold text-foreground">{holdingMonths} Meses</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground font-semibold">Lucro Líquido Final:</span>
+                    <span className="font-black text-emerald-600 text-sm">${netProfit.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-muted-foreground font-semibold">Retorno sobre Capital (ROI):</span>
+                    <span className="font-black text-purple-600 text-sm">{roi}% ROI</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Strategy 2: BRRRR Rental */}
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-xs space-y-5 relative overflow-hidden">
+                <div className="flex items-center justify-between border-b border-border pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-bold">
+                      <Home className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base text-foreground">Estratégia BRRRR (Locação)</h3>
+                      <p className="text-xs text-muted-foreground">Aluguel de longo prazo com fluxo de caixa.</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-indigo-600 bg-indigo-500/10 px-3 py-1 rounded-xl">
+                    Renda Passiva
+                  </span>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Aluguel Mensal Estimado ($):</span>
+                    <Input
+                      type="number"
+                      value={monthlyRent}
+                      onChange={(e) => setMonthlyRent(Number(e.target.value))}
+                      className="w-28 h-8 rounded-xl text-right font-bold text-xs"
+                    />
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Receita Operacional Líquida (NOI):</span>
+                    <span className="font-bold text-foreground">${noi.toLocaleString()}/ano</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Cap Rate Projetado:</span>
+                    <span className="font-black text-indigo-600 text-sm">{capRate}% Cap Rate</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-muted-foreground font-semibold">Cash Flow Mensal Líquido:</span>
+                    <span className="font-black text-emerald-600 text-sm">${monthlyCashflow.toLocaleString()}/mês</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </TabsContent>
+
+        </Tabs>
 
       </div>
     </div>
