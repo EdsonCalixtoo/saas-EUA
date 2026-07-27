@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BuyerListRouteImport } from './routes/buyer-list'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as CallsRouteImport } from './routes/calls'
 import { Route as CommunicationsRouteImport } from './routes/communications'
@@ -29,6 +30,11 @@ import { Route as TitleCompaniesRouteImport } from './routes/title-companies'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuyerListRoute = BuyerListRouteImport.update({
+  id: '/buyer-list',
+  path: '/buyer-list',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalendarRoute = CalendarRouteImport.update({
@@ -109,6 +115,7 @@ const TitleCompaniesRoute = TitleCompaniesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/buyer-list': typeof BuyerListRoute
   '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/buyer-list': typeof BuyerListRoute
   '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
@@ -146,6 +154,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/buyer-list': typeof BuyerListRoute
   '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/buyer-list'
     | '/calendar'
     | '/calls'
     | '/communications'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/buyer-list'
     | '/calendar'
     | '/calls'
     | '/communications'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/buyer-list'
     | '/calendar'
     | '/calls'
     | '/communications'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BuyerListRoute: typeof BuyerListRoute
   CalendarRoute: typeof CalendarRoute
   CallsRoute: typeof CallsRoute
   CommunicationsRoute: typeof CommunicationsRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/buyer-list': {
+      id: '/buyer-list'
+      path: '/buyer-list'
+      fullPath: '/buyer-list'
+      preLoaderRoute: typeof BuyerListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calendar': {
@@ -357,6 +377,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BuyerListRoute: BuyerListRoute,
   CalendarRoute: CalendarRoute,
   CallsRoute: CallsRoute,
   CommunicationsRoute: CommunicationsRoute,
