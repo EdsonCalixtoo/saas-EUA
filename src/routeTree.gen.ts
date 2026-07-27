@@ -16,6 +16,7 @@ import { Route as CommunicationsRouteImport } from './routes/communications'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as EmailRouteImport } from './routes/email'
 import { Route as LeadsRouteImport } from './routes/leads'
+import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as SmsRouteImport } from './routes/sms'
@@ -56,6 +57,11 @@ const LeadsRoute = LeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentsRoute = PaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PipelineRoute = PipelineRouteImport.update({
   id: '/pipeline',
   path: '/pipeline',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
+  '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
+  '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
+  '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/email'
     | '/leads'
+    | '/payments'
     | '/pipeline'
     | '/properties'
     | '/sms'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/email'
     | '/leads'
+    | '/payments'
     | '/pipeline'
     | '/properties'
     | '/sms'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/email'
     | '/leads'
+    | '/payments'
     | '/pipeline'
     | '/properties'
     | '/sms'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   EmailRoute: typeof EmailRoute
   LeadsRoute: typeof LeadsRoute
+  PaymentsRoute: typeof PaymentsRoute
   PipelineRoute: typeof PipelineRoute
   PropertiesRoute: typeof PropertiesRoute
   SmsRoute: typeof SmsRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payments': {
+      id: '/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pipeline': {
       id: '/pipeline'
       path: '/pipeline'
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRoute,
   EmailRoute: EmailRoute,
   LeadsRoute: LeadsRoute,
+  PaymentsRoute: PaymentsRoute,
   PipelineRoute: PipelineRoute,
   PropertiesRoute: PropertiesRoute,
   SmsRoute: SmsRoute,

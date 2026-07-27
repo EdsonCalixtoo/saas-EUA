@@ -45,7 +45,7 @@ const nav: NavItem[] = [
     ],
   },
   { icon: CheckSquare,     label: "Tasks",           to: "/tasks" as const },
-  { icon: CreditCard,      label: "Payments",        to: null },
+  { icon: CreditCard,      label: "Payments",        to: "/payments" as const },
 
   // --- DIVIDER ---
   { icon: null, label: "div1", isDivider: true },
