@@ -26,7 +26,7 @@ interface NavItem {
 const nav: NavItem[] = [
   { icon: LayoutDashboard, label: "Dashboard",      to: "/" as const },
   { icon: Users,           label: "Leads",           to: "/leads" as const },
-  { icon: GitBranch,       label: "Pipeline",        to: "/pipeline" as const },
+  { icon: GitBranch,       label: "Opportunities",   to: "/pipeline" as const },
   {
     icon: MessageSquare,
     label: "Conversations",

@@ -5,6 +5,7 @@ import {
   Filter, Settings2, Zap, Home, ChevronDown, DollarSign,
   Target, Award, XCircle, BarChart3, X, Check, ArrowUpDown,
   SlidersHorizontal, Eye, EyeOff, ChevronRight,
+  Download, Users, Tag, Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -753,6 +754,15 @@ function ProgressBar({ deals }: { deals: Deal[] }) {
 }
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
+type OppTab = "opportunities" | "pipelines" | "bulkactions";
+
+const PIPELINES = [
+  { id: "main",       label: "Main Pipeline"       },
+  { id: "wholesale",  label: "Wholesale Pipeline"  },
+  { id: "novation",   label: "Novation Pipeline"   },
+  { id: "buyers",     label: "Buyers Pipeline"     },
+];
+
 export function PipelineBoard() {
   const [view, setView]               = useState<ViewMode>("board");
   const [groupBy, setGroupBy]         = useState<GroupBy>("stage");
@@ -762,6 +772,19 @@ export function PipelineBoard() {
   const [addOpen, setAddOpen]         = useState(false);
   const [hiddenStages, setHiddenStages] = useState<Stage[]>([]);
   const [deals, setDeals]             = useState<Deal[]>(DEALS);
+  const [oppTab, setOppTab]           = useState<OppTab>("opportunities");
+  const [activePipeline, setActivePipeline] = useState(PIPELINES[0]);
+  const [pipelineDropOpen, setPipelineDropOpen] = useState(false);
+  const pipelineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fn = (e: MouseEvent) => {
+      if (pipelineRef.current && !pipelineRef.current.contains(e.target as Node))
+        setPipelineDropOpen(false);
+    };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, []);
 
   const [filters, setFilters] = useState<ActiveFilters>({
     stages: [], reps: [], sources: [], minValue: "", maxValue: "",
@@ -822,88 +845,162 @@ export function PipelineBoard() {
   };
 
   return (
-    <div className="relative flex flex-col gap-5 p-6 pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Pipeline</h1>
-          <button className="mt-0.5 flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
-            Board View <ChevronDown className="h-3.5 w-3.5" />
-          </button>
+    <div className="relative flex flex-col overflow-hidden" style={{ height: "calc(100vh - 65px)" }}>
+
+      {/* ── GHL-style top bar ──────────────────────────────────────────── */}
+      <div className="flex-shrink-0 border-b border-border bg-card px-6">
+        {/* Title row + action buttons */}
+        <div className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Opportunities</h1>
+            {/* Tab bar */}
+            <div className="flex items-center gap-0">
+              {([
+                { key: "opportunities", label: "Opportunities" },
+                { key: "pipelines",     label: "Pipelines"     },
+                { key: "bulkactions",   label: "Bulk Actions"  },
+              ] as { key: OppTab; label: string }[]).map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setOppTab(tab.key)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-semibold transition-colors relative whitespace-nowrap",
+                    oppTab === tab.key
+                      ? "text-primary border-b-2 border-primary"
+                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent",
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setFiltersOpen(true)}
+              className={cn(
+                "inline-flex h-8 items-center gap-2 rounded-lg border px-3 text-xs font-medium transition",
+                activeFilterCount > 0
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-card text-foreground hover:bg-accent"
+              )}
+            >
+              <Filter className="h-3.5 w-3.5" />
+              {activeFilterCount > 0 ? `Filters (${activeFilterCount})` : "Filters"}
+            </button>
+            <button onClick={() => setSettingsOpen(true)} className="inline-flex h-8 items-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-medium text-foreground transition hover:bg-accent">
+              <Settings2 className="h-3.5 w-3.5" /> Settings
+            </button>
+            <button className="inline-flex h-8 items-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-medium text-foreground transition hover:bg-accent">
+              <Download className="h-3.5 w-3.5" /> Import
+            </button>
+            <button onClick={() => setAddOpen(true)} className="inline-flex h-8 items-center gap-2 rounded-lg bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90">
+              <Plus className="h-3.5 w-3.5" /> Add Opportunity
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setFiltersOpen(true)}
-            className={cn(
-              "inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium shadow-sm transition",
-              activeFilterCount > 0
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-card text-foreground hover:bg-accent"
-            )}
-          >
-            <Filter className="h-4 w-4" />
-            Filters
-            {activeFilterCount > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-          <button onClick={() => setSettingsOpen(true)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground shadow-sm transition hover:bg-accent">
-            <Settings2 className="h-4 w-4" /> Board Settings
-          </button>
-          <button onClick={() => setAddOpen(true)} className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90">
-            <Plus className="h-4 w-4" /> Add Deal
-          </button>
-        </div>
+
+        {/* Pipeline selector + view count + view toggle */}
+        {oppTab === "opportunities" && (
+          <div className="flex items-center justify-between pb-3">
+            <div className="flex items-center gap-3">
+              {/* Pipeline dropdown */}
+              <div ref={pipelineRef} className="relative">
+                <button
+                  onClick={() => setPipelineDropOpen(!pipelineDropOpen)}
+                  className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground hover:bg-accent transition"
+                >
+                  {activePipeline.label}
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+                {pipelineDropOpen && (
+                  <div className="absolute left-0 top-full z-30 mt-1.5 w-52 overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+                    {PIPELINES.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => { setActivePipeline(p); setPipelineDropOpen(false); }}
+                        className={cn(
+                          "flex w-full items-center justify-between px-4 py-2.5 text-sm transition hover:bg-accent",
+                          activePipeline.id === p.id && "text-primary font-semibold",
+                        )}
+                      >
+                        {p.label}
+                        {activePipeline.id === p.id && <Check className="h-3.5 w-3.5" />}
+                      </button>
+                    ))}
+                    <div className="border-t border-border">
+                      <button className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-primary hover:bg-accent transition">
+                        <Plus className="h-3.5 w-3.5" /> New Pipeline
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Open count */}
+              <button className="flex items-center gap-1.5 rounded-xl border-b-2 border-primary px-3 py-1.5 text-sm font-semibold text-primary">
+                Open opportunities
+                <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-bold text-primary">
+                  {filteredDeals.length}
+                </span>
+              </button>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition">
+                <Plus className="h-3.5 w-3.5" /> List
+              </button>
+            </div>
+
+            {/* View toggle + Group/Sort */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5 rounded-lg border border-border bg-card p-0.5">
+                {(["board","list","table"] as ViewMode[]).map(v => {
+                  const Icon = v === "board" ? LayoutGrid : v === "list" ? List : Table2;
+                  return (
+                    <button key={v} onClick={() => setView(v)}
+                      className={cn("flex items-center justify-center rounded-md px-2.5 py-1.5 transition-all",
+                        view===v ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground")}
+                      title={v}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                    </button>
+                  );
+                })}
+              </div>
+              <Dropdown<GroupBy>
+                label="Group"
+                value={groupBy}
+                onChange={setGroupBy}
+                options={[
+                  { value:"stage",  label:"Stage"  },
+                  { value:"rep",    label:"Rep"    },
+                  { value:"source", label:"Source" },
+                ]}
+              />
+              <Dropdown<SortBy>
+                label="Sort"
+                value={sortBy}
+                onChange={setSortBy}
+                options={[
+                  { value:"custom",     label:"Custom"         },
+                  { value:"newest",     label:"Newest"         },
+                  { value:"oldest",     label:"Oldest"         },
+                  { value:"value_high", label:"Value: High→Low" },
+                  { value:"value_low",  label:"Value: Low→High" },
+                ]}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* ── Content ────────────────────────────────────────────────────── */}
+      <div className="flex flex-1 flex-col overflow-auto p-6 pb-8 gap-5">
+
+      {/* Opportunities tab */}
+      {oppTab === "opportunities" && (<>
       {/* Stats */}
       <StatBar />
 
-      {/* View switcher + Group/Sort */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 rounded-xl border border-border bg-card p-1">
-          {(["board","list","table"] as ViewMode[]).map(v => {
-            const Icon = v === "board" ? LayoutGrid : v === "list" ? List : Table2;
-            return (
-              <button key={v} onClick={() => setView(v)}
-                className={cn("inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
-                  view===v ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {v.charAt(0).toUpperCase()+v.slice(1)}
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex items-center gap-2">
-          <Dropdown<GroupBy>
-            label="Group by"
-            value={groupBy}
-            onChange={setGroupBy}
-            options={[
-              { value:"stage",  label:"Stage"  },
-              { value:"rep",    label:"Rep"    },
-              { value:"source", label:"Source" },
-            ]}
-          />
-          <Dropdown<SortBy>
-            label="Sort by"
-            value={sortBy}
-            onChange={setSortBy}
-            options={[
-              { value:"custom",     label:"Custom"        },
-              { value:"newest",     label:"Newest"        },
-              { value:"oldest",     label:"Oldest"        },
-              { value:"value_high", label:"Value: High→Low" },
-              { value:"value_low",  label:"Value: Low→High" },
-            ]}
-          />
-        </div>
-      </div>
-
-      {/* Content */}
       {view === "board" && (
         <div className="overflow-x-auto pb-3">
           <div className="flex gap-3" style={{ minWidth: "max-content" }}>
@@ -931,6 +1028,71 @@ export function PipelineBoard() {
 
       {/* Progress bar */}
       <ProgressBar deals={filteredDeals} />
+      </>)}
+
+      {/* Pipelines tab */}
+      {oppTab === "pipelines" && (
+        <div className="max-w-2xl space-y-3">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-bold text-foreground">Your Pipelines</h2>
+              <p className="text-xs text-muted-foreground">Manage multiple deal pipelines for different strategies.</p>
+            </div>
+            <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary/90">
+              <Plus className="h-3.5 w-3.5" /> New Pipeline
+            </button>
+          </div>
+          {PIPELINES.map(p => (
+            <div key={p.id} className="flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-4 shadow-sm hover:border-primary/40 transition-all">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground">{p.label}</p>
+                  <p className="text-xs text-muted-foreground">{DEALS.length} opportunities &nbsp;·&nbsp; ${DEALS.reduce((s,d)=>s+d.estValue,0).toLocaleString()} total value</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => { setActivePipeline(p); setOppTab("opportunities"); }} className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition">View Pipeline</button>
+                <button className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold hover:bg-accent transition">Edit</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Bulk Actions tab */}
+      {oppTab === "bulkactions" && (
+        <div className="max-w-3xl">
+          <div className="mb-4">
+            <h2 className="text-base font-bold text-foreground">Bulk Actions</h2>
+            <p className="text-xs text-muted-foreground">Select opportunities from the board and apply actions in bulk.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { icon: Filter,    label: "Move Stage",       desc: "Move all selected deals to a specific stage."          },
+              { icon: Users,     label: "Reassign Rep",      desc: "Assign selected opportunities to a different rep."      },
+              { icon: Tag,       label: "Add Tag",           desc: "Apply a tag label to all selected deals."               },
+              { icon: Mail,      label: "Send Email Sequence",desc: "Enroll contacts in an email drip campaign."            },
+              { icon: Download,  label: "Export CSV",        desc: "Download selected deals as a spreadsheet file."         },
+              { icon: Trash2,    label: "Delete Selected",   desc: "Permanently remove selected opportunities."             },
+              { icon: Target,    label: "Mark as Won",       desc: "Close all selected deals as Closed (Won)."              },
+              { icon: XCircle,   label: "Mark as Lost",      desc: "Archive all selected deals as Closed (Lost)."           },
+            ].map(action => (
+              <button key={action.label} className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 text-left hover:border-primary/40 hover:bg-accent/30 transition-all">
+                <action.icon className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-xs font-bold text-foreground">{action.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{action.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      </div> {/* end scrollable content */}
 
       {/* Panels & Modal */}
       <FiltersPanel
