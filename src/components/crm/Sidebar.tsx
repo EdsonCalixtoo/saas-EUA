@@ -34,7 +34,7 @@ const nav: NavItem[] = [
       { icon: Inbox,         label: "All Communications", to: "/communications" as const },
       { icon: Phone,         label: "Calls",              to: "/calls" as const },
       { icon: MessageCircle, label: "SMS",                to: "/sms" as const },
-      { icon: Mail,          label: "Email",              to: null, badge: "Soon" },
+      { icon: Mail,          label: "Email",              to: "/email" as const },
     ],
   },
   { icon: CheckSquare,     label: "Tasks",           to: null },
