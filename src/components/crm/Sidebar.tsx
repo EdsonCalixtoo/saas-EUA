@@ -46,7 +46,7 @@ const nav: NavItem[] = [
     ],
   },
   { icon: Contact,         label: "Contacts",        to: "/contacts" as const },
-  { icon: Home,            label: "Properties",      to: null },
+  { icon: Home,            label: "Properties",      to: "/properties" as const },
   { icon: Megaphone,       label: "Campaigns",       to: null },
   { icon: Zap,             label: "Automations",     to: null },
   { icon: FileText,        label: "Documents",       to: null },

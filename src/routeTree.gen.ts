@@ -17,6 +17,7 @@ import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as EmailRouteImport } from './routes/email'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as PipelineRouteImport } from './routes/pipeline'
+import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as SmsRouteImport } from './routes/sms'
 import { Route as TasksRouteImport } from './routes/tasks'
 
@@ -60,6 +61,11 @@ const PipelineRoute = PipelineRouteImport.update({
   path: '/pipeline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PropertiesRoute = PropertiesRouteImport.update({
+  id: '/properties',
+  path: '/properties',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SmsRoute = SmsRouteImport.update({
   id: '/sms',
   path: '/sms',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
+  '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
+  '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
+  '/properties': typeof PropertiesRoute
   '/sms': typeof SmsRoute
   '/tasks': typeof TasksRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/email'
     | '/leads'
     | '/pipeline'
+    | '/properties'
     | '/sms'
     | '/tasks'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/email'
     | '/leads'
     | '/pipeline'
+    | '/properties'
     | '/sms'
     | '/tasks'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/email'
     | '/leads'
     | '/pipeline'
+    | '/properties'
     | '/sms'
     | '/tasks'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   EmailRoute: typeof EmailRoute
   LeadsRoute: typeof LeadsRoute
   PipelineRoute: typeof PipelineRoute
+  PropertiesRoute: typeof PropertiesRoute
   SmsRoute: typeof SmsRoute
   TasksRoute: typeof TasksRoute
 }
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PipelineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/properties': {
+      id: '/properties'
+      path: '/properties'
+      fullPath: '/properties'
+      preLoaderRoute: typeof PropertiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sms': {
       id: '/sms'
       path: '/sms'
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailRoute: EmailRoute,
   LeadsRoute: LeadsRoute,
   PipelineRoute: PipelineRoute,
+  PropertiesRoute: PropertiesRoute,
   SmsRoute: SmsRoute,
   TasksRoute: TasksRoute,
 }
