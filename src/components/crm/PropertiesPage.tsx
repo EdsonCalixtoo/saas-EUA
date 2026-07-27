@@ -706,7 +706,7 @@ export function PropertiesPage() {
   const avgEquity  = Math.round(filtered.reduce((s, p) => s + p.equityPct, 0) / filtered.length);
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
 
       {/* ── Top header ──────────────────────────────────────────────────── */}
       <div className="flex-shrink-0 border-b border-border bg-card px-6 py-3">
