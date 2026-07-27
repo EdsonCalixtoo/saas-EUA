@@ -15,7 +15,9 @@ import { Route as CallsRouteImport } from './routes/calls'
 import { Route as CommunicationsRouteImport } from './routes/communications'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as EmailRouteImport } from './routes/email'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as LeadsRouteImport } from './routes/leads'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as PropertiesRouteImport } from './routes/properties'
@@ -53,9 +55,19 @@ const EmailRoute = EmailRouteImport.update({
   path: '/email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LeadsRoute = LeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentsRoute = PaymentsRouteImport.update({
@@ -96,7 +108,9 @@ export interface FileRoutesByFullPath {
   '/communications': typeof CommunicationsRoute
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
+  '/home': typeof HomeRoute
   '/leads': typeof LeadsRoute
+  '/login': typeof LoginRoute
   '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
@@ -111,7 +125,9 @@ export interface FileRoutesByTo {
   '/communications': typeof CommunicationsRoute
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
+  '/home': typeof HomeRoute
   '/leads': typeof LeadsRoute
+  '/login': typeof LoginRoute
   '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
@@ -127,7 +143,9 @@ export interface FileRoutesById {
   '/communications': typeof CommunicationsRoute
   '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
+  '/home': typeof HomeRoute
   '/leads': typeof LeadsRoute
+  '/login': typeof LoginRoute
   '/payments': typeof PaymentsRoute
   '/pipeline': typeof PipelineRoute
   '/properties': typeof PropertiesRoute
@@ -144,7 +162,9 @@ export interface FileRouteTypes {
     | '/communications'
     | '/contacts'
     | '/email'
+    | '/home'
     | '/leads'
+    | '/login'
     | '/payments'
     | '/pipeline'
     | '/properties'
@@ -159,7 +179,9 @@ export interface FileRouteTypes {
     | '/communications'
     | '/contacts'
     | '/email'
+    | '/home'
     | '/leads'
+    | '/login'
     | '/payments'
     | '/pipeline'
     | '/properties'
@@ -174,7 +196,9 @@ export interface FileRouteTypes {
     | '/communications'
     | '/contacts'
     | '/email'
+    | '/home'
     | '/leads'
+    | '/login'
     | '/payments'
     | '/pipeline'
     | '/properties'
@@ -190,7 +214,9 @@ export interface RootRouteChildren {
   CommunicationsRoute: typeof CommunicationsRoute
   ContactsRoute: typeof ContactsRoute
   EmailRoute: typeof EmailRoute
+  HomeRoute: typeof HomeRoute
   LeadsRoute: typeof LeadsRoute
+  LoginRoute: typeof LoginRoute
   PaymentsRoute: typeof PaymentsRoute
   PipelineRoute: typeof PipelineRoute
   PropertiesRoute: typeof PropertiesRoute
@@ -243,11 +269,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/leads': {
       id: '/leads'
       path: '/leads'
       fullPath: '/leads'
       preLoaderRoute: typeof LeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payments': {
@@ -302,7 +342,9 @@ const rootRouteChildren: RootRouteChildren = {
   CommunicationsRoute: CommunicationsRoute,
   ContactsRoute: ContactsRoute,
   EmailRoute: EmailRoute,
+  HomeRoute: HomeRoute,
   LeadsRoute: LeadsRoute,
+  LoginRoute: LoginRoute,
   PaymentsRoute: PaymentsRoute,
   PipelineRoute: PipelineRoute,
   PropertiesRoute: PropertiesRoute,

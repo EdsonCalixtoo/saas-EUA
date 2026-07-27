@@ -1,12 +1,10 @@
-"use client"
-
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { motion, AnimatePresence } from "framer-motion"
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useNavigate } from "@tanstack/react-router"
 import { SocialButtons } from "./SocialButtons"
 import { toast } from "sonner" // Assuming sonner is installed based on standard Shadcn projects
 
@@ -22,7 +20,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [globalError, setGlobalError] = React.useState<string | null>(null)
-  const router = useRouter()
+  const navigate = useNavigate()
 
   const {
     register,
@@ -63,7 +61,7 @@ export function LoginForm() {
       localStorage.setItem("propflow_user", JSON.stringify({ email: data.email, role: "admin" }))
       localStorage.setItem("propflow_permissions", JSON.stringify(["read", "write", "delete"]))
 
-      router.push("/dashboard")
+      navigate({ to: "/" })
     } catch (error: any) {
       if (error.message === "SERVER_ERROR") {
         toast.error("Unable to connect to the server. Please try again.")

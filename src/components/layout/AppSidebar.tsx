@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Link, useRouterState } from "@tanstack/react-router"
 import {
   LayoutDashboard, Users, Building2, Phone, MessageSquare, Mail,
   Megaphone, GitMerge, CheckSquare, BarChart2, Calendar, Handshake,

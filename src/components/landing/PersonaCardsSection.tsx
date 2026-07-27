@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
 import { ShoppingBag, Tag, UserCheck, Building2, ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"

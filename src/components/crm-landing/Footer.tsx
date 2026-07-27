@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 import { Building2, Globe, Mail, MessageSquare, Share2 } from "lucide-react"
 
 export function Footer() {
