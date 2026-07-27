@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as CallsRouteImport } from './routes/calls'
 import { Route as CommunicationsRouteImport } from './routes/communications'
+import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as EmailRouteImport } from './routes/email'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as PipelineRouteImport } from './routes/pipeline'
@@ -37,6 +38,11 @@ const CallsRoute = CallsRouteImport.update({
 const CommunicationsRoute = CommunicationsRouteImport.update({
   id: '/communications',
   path: '/communications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactsRoute = ContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailRoute = EmailRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
+  '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
+  '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarRoute
   '/calls': typeof CallsRoute
   '/communications': typeof CommunicationsRoute
+  '/contacts': typeof ContactsRoute
   '/email': typeof EmailRoute
   '/leads': typeof LeadsRoute
   '/pipeline': typeof PipelineRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/calls'
     | '/communications'
+    | '/contacts'
     | '/email'
     | '/leads'
     | '/pipeline'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/calls'
     | '/communications'
+    | '/contacts'
     | '/email'
     | '/leads'
     | '/pipeline'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/calls'
     | '/communications'
+    | '/contacts'
     | '/email'
     | '/leads'
     | '/pipeline'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   CalendarRoute: typeof CalendarRoute
   CallsRoute: typeof CallsRoute
   CommunicationsRoute: typeof CommunicationsRoute
+  ContactsRoute: typeof ContactsRoute
   EmailRoute: typeof EmailRoute
   LeadsRoute: typeof LeadsRoute
   PipelineRoute: typeof PipelineRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/communications'
       fullPath: '/communications'
       preLoaderRoute: typeof CommunicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacts': {
+      id: '/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof ContactsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email': {
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarRoute: CalendarRoute,
   CallsRoute: CallsRoute,
   CommunicationsRoute: CommunicationsRoute,
+  ContactsRoute: ContactsRoute,
   EmailRoute: EmailRoute,
   LeadsRoute: LeadsRoute,
   PipelineRoute: PipelineRoute,
