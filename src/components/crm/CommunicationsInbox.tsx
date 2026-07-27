@@ -4,7 +4,7 @@ import {
   PhoneMissed, Play, Send, ChevronDown, MoreHorizontal,
   Star, Archive, CheckCheck, Check, Plus, X,
   TrendingUp, Inbox, Pause, SkipBack, Download,
-  Pencil, Trash2, Filter, RefreshCw,
+  Pencil, Trash2, Filter, RefreshCw, ArrowLeft, ChevronLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -318,6 +318,8 @@ export function CommunicationsInbox() {
   const [dialerOpen, setDialerOpen]       = useState(false);
   const threadEndRef                      = useRef<HTMLDivElement>(null);
 
+  const [mobileView, setMobileView]       = useState<"list" | "thread">("list");
+
   const selectedConv = convs.find(c => c.id === selectedId)!;
   const rawMessages  = allMessages[selectedId] ?? [];
   const messages     = threadFilter === "all" ? rawMessages : rawMessages.filter(m => m.type === threadFilter);
@@ -336,6 +338,7 @@ export function CommunicationsInbox() {
   const selectConv = (id: number) => {
     setSelectedId(id);
     setThreadFilter("all");
+    setMobileView("thread");
     setConvs(prev => prev.map(c => c.id === id ? {...c, unread: 0} : c));
     setAllMessages(prev => ({...prev, [id]: (prev[id]??[]).map(m => ({...m, read:true}))}));
   };
@@ -410,7 +413,7 @@ export function CommunicationsInbox() {
       <div className="flex flex-1 overflow-hidden">
 
         {/* ── LEFT: conversation list ──────────────────────────── */}
-        <div className="flex w-80 shrink-0 flex-col border-r border-border">
+        <div className={cn("flex w-full md:w-80 shrink-0 flex-col border-r border-border", mobileView === "thread" ? "hidden md:flex" : "flex")}>
           {/* Search + New */}
           <div className="flex items-center gap-2 border-b border-border p-3">
             <div className="relative flex-1">
@@ -515,25 +518,31 @@ export function CommunicationsInbox() {
         </div>
 
         {/* ── RIGHT: thread ──────────────────────────────────────── */}
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className={cn("flex flex-1 flex-col overflow-hidden", mobileView === "list" ? "hidden md:flex" : "flex")}>
 
           {/* Thread header */}
-          <div className="flex items-center justify-between border-b border-border px-6 py-3.5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white" style={{backgroundColor: selectedConv.leadColor}}>
+          <div className="flex items-center justify-between border-b border-border px-4 md:px-6 py-3.5">
+            <div className="flex items-center gap-2 md:gap-3">
+              {/* Mobile Back Button */}
+              <button
+                onClick={() => setMobileView("list")}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground md:hidden shrink-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+
+              <div className="flex h-9 w-9 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-full text-xs md:text-sm font-bold text-white" style={{backgroundColor: selectedConv.leadColor}}>
                 {selectedConv.leadInitials}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-bold text-foreground">{selectedConv.leadName}</h2>
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{backgroundColor: selectedConv.stageColor+"22", color: selectedConv.stageColor}}>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <h2 className="text-sm md:text-base font-bold text-foreground truncate">{selectedConv.leadName}</h2>
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0" style={{backgroundColor: selectedConv.stageColor+"22", color: selectedConv.stageColor}}>
                     {selectedConv.stage}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                  <span>{selectedConv.address}, {selectedConv.city}, {selectedConv.state}</span>
-                  <span className="flex items-center gap-1"><Phone className="h-3 w-3"/>{selectedConv.phone}</span>
-                  <span className="flex items-center gap-1"><Mail className="h-3 w-3"/>{selectedConv.email}</span>
+                <div className="flex items-center gap-2 text-[10px] md:text-[11px] text-muted-foreground truncate">
+                  <span className="truncate">{selectedConv.address}, {selectedConv.city}</span>
                 </div>
               </div>
             </div>

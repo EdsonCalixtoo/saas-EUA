@@ -397,8 +397,8 @@ function CallDetailPanel({ call, onClose, onUpdate, onCall, showToast }: {
     setEmailBody(""); setEmailSubject(""); setShowEmailCompose(false);
   };
 
-  return (
-    <div className="flex h-full w-[360px] shrink-0 flex-col border-l border-border bg-card overflow-hidden">
+  const panelContent = (
+    <div className="flex h-full w-full lg:w-[360px] shrink-0 flex-col border-l border-border bg-card overflow-hidden">
       {/* Header */}
       <div className="flex items-start justify-between border-b border-border p-4">
         <div className="flex items-center gap-3">
@@ -617,6 +617,23 @@ function CallDetailPanel({ call, onClose, onUpdate, onCall, showToast }: {
         <PropertyModal call={call} onClose={() => setPropertyModalOpen(false)} />
       )}
     </div>
+  );
+
+  return (
+    <>
+      {/* Desktop inline panel */}
+      <div className="hidden lg:block h-full shrink-0">
+        {panelContent}
+      </div>
+
+      {/* Mobile / Tablet slide-over drawer */}
+      <div className="fixed inset-0 z-50 flex lg:hidden">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose} />
+        <div className="relative z-10 ml-auto h-full w-full max-w-sm animate-in slide-in-from-right duration-300">
+          {panelContent}
+        </div>
+      </div>
+    </>
   );
 }
 

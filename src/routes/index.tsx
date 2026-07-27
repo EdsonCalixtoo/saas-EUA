@@ -34,13 +34,13 @@ function Index() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Overview</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">Real Estate Investment Overview</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
             <StatCard label="New Leads" value="1,253" delta={18.6} compare="May 5 – May 11" icon={Users} color="oklch(0.55 0.22 265)" data={spark(60)} />
             <StatCard label="Active Deals" value="96" delta={11.2} compare="May 5 – May 11" icon={DollarSign} color="oklch(0.7 0.18 155)" data={spark(50, 10)} />
             <StatCard label="Pipeline Value" value="$2.45M" delta={8.7} compare="May 5 – May 11" icon={PieChart} color="oklch(0.65 0.19 300)" data={spark(55, 12)} />
