@@ -1,11 +1,11 @@
-import { LandingPage } from "@/components/landing/LandingPage"
+import { CrmLandingPage } from "@/components/crm-landing/CrmLandingPage"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "PropFlow | Plataforma Imobiliária SaaS de Alto Padrão",
-  description: "Encontre, anuncie e venda imóveis com inteligência artificial, CRM, mapas, discador e automações.",
+  title: "PropFlow | The Smartest CRM for Real Estate Teams",
+  description: "Manage leads, automate follow-ups, close more deals and grow your business using AI-powered workflows, marketing automation and a complete real estate CRM.",
 }
 
 export default function HomePage() {
-  return <LandingPage />
+  return <CrmLandingPage />
 }
