@@ -1,21 +1,42 @@
+import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, GitBranch, MessageSquare, Phone, MessageCircle,
   Mail, CheckSquare, Calendar, Contact, Home, Megaphone, Zap, FileText,
-  BarChart3, Plug, Settings, ChevronDown, X,
+  BarChart3, Plug, Settings, ChevronDown, ChevronRight, X, Inbox,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DealVantaLogo } from "@/components/crm/DealVantaLogo";
 import { useSidebar } from "@/context/SidebarContext";
 
-const nav = [
+interface NavSubItem {
+  icon: any;
+  label: string;
+  to: string | null;
+  badge?: string;
+}
+
+interface NavItem {
+  icon: any;
+  label: string;
+  to?: string | null;
+  children?: NavSubItem[];
+}
+
+const nav: NavItem[] = [
   { icon: LayoutDashboard, label: "Dashboard",      to: "/" as const },
   { icon: Users,           label: "Leads",           to: "/leads" as const },
   { icon: GitBranch,       label: "Pipeline",        to: "/pipeline" as const },
-  { icon: MessageSquare,   label: "Communications",  to: "/communications" as const },
-  { icon: Phone,           label: "Calls",           to: "/calls" as const },
-  { icon: MessageCircle,   label: "SMS",             to: "/sms" as const },
-  { icon: Mail,            label: "Email",           to: null },
+  {
+    icon: MessageSquare,
+    label: "Conversations",
+    children: [
+      { icon: Inbox,         label: "All Communications", to: "/communications" as const },
+      { icon: Phone,         label: "Calls",              to: "/calls" as const },
+      { icon: MessageCircle, label: "SMS",                to: "/sms" as const },
+      { icon: Mail,          label: "Email",              to: null, badge: "Soon" },
+    ],
+  },
   { icon: CheckSquare,     label: "Tasks",           to: null },
   { icon: Calendar,        label: "Calendar",        to: null },
   { icon: Contact,         label: "Contacts",        to: null },
@@ -32,6 +53,10 @@ export function Sidebar() {
   const pathname = routerState.location.pathname;
   const { isOpen, close } = useSidebar();
 
+  // Conversations dropdown state (auto-expanded if current route is inside conversations)
+  const isInsideConversations = ["/communications", "/calls", "/sms", "/email"].includes(pathname);
+  const [conversationsExpanded, setConversationsExpanded] = useState(isInsideConversations);
+
   const sidebarContent = (
     <aside className="flex h-full w-64 flex-col bg-sidebar text-sidebar-foreground">
       {/* Header */}
@@ -47,8 +72,89 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
         {nav.map((item) => {
+          // If item has children (like Conversations group)
+          if (item.children) {
+            const hasActiveChild = item.children.some(child => child.to !== null && pathname === child.to);
+
+            return (
+              <div key={item.label} className="space-y-1">
+                {/* Group Parent Button */}
+                <button
+                  onClick={() => setConversationsExpanded(!conversationsExpanded)}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors select-none",
+                    hasActiveChild || conversationsExpanded
+                      ? "text-white bg-sidebar-accent/60"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-white",
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                    <span>{item.label}</span>
+                  </div>
+                  {conversationsExpanded ? (
+                    <ChevronDown className="h-4 w-4 shrink-0 opacity-70" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
+                  )}
+                </button>
+
+                {/* Sub-items */}
+                {conversationsExpanded && (
+                  <div className="ml-3 pl-3 border-l border-sidebar-border/40 space-y-1 my-1">
+                    {item.children.map(sub => {
+                      const isSubActive = sub.to !== null && pathname === sub.to;
+                      const subClass = cn(
+                        "flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                        isSubActive
+                          ? "bg-primary text-white font-semibold shadow-sm"
+                          : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-white",
+                      );
+
+                      if (sub.to) {
+                        return (
+                          <Link
+                            key={sub.label}
+                            to={sub.to}
+                            className={subClass}
+                            onClick={close}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <sub.icon className="h-3.5 w-3.5 shrink-0" />
+                              <span>{sub.label}</span>
+                            </div>
+                            {sub.badge && (
+                              <span className="rounded-full bg-sidebar-accent px-1.5 py-0.2 text-[9px] font-semibold text-sidebar-foreground">
+                                {sub.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      }
+
+                      return (
+                        <div key={sub.label} className={cn(subClass, "opacity-60 cursor-not-allowed")}>
+                          <div className="flex items-center gap-2.5">
+                            <sub.icon className="h-3.5 w-3.5 shrink-0" />
+                            <span>{sub.label}</span>
+                          </div>
+                          {sub.badge && (
+                            <span className="rounded-full bg-sidebar-accent px-1.5 py-0.2 text-[9px] font-semibold text-sidebar-foreground">
+                              {sub.badge}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          // Single Items
           const isActive = item.to !== null && pathname === item.to;
           const baseClass = cn(
             "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
