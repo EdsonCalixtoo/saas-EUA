@@ -203,7 +203,6 @@ export function ContactsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [activeSmartList, setActiveSmartList] = useState<SmartList>(SMART_LISTS[0]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [detailContact, setDetailContact] = useState<Contact | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -269,16 +268,11 @@ export function ContactsPage() {
 
   const filteredContacts = useMemo(() => {
     let list = contacts;
-    // Apply smart list filter
-    if (activeSmartList.filter.status) list = list.filter(c => c.status === activeSmartList.filter.status);
-    if (activeSmartList.filter.type)   list = list.filter(c => c.type === activeSmartList.filter.type);
-    if (activeSmartList.filter.starred !== undefined) list = list.filter(c => c.starred === activeSmartList.filter.starred);
-    // Apply search
     if (search) list = list.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search) || c.email.toLowerCase().includes(search.toLowerCase()) || c.address.toLowerCase().includes(search.toLowerCase()));
     if (statusFilter !== "all") list = list.filter(c => c.status === statusFilter);
     if (typeFilter   !== "all") list = list.filter(c => c.type === typeFilter);
     return list;
-  }, [contacts, search, statusFilter, typeFilter, activeSmartList]);
+  }, [contacts, search, statusFilter, typeFilter]);
 
   const tabs: { key: ActiveTab; label: string }[] = [
     { key: "smartlists", label: "Smart Lists" },
@@ -290,59 +284,6 @@ export function ContactsPage() {
 
   return (
     <div className="flex h-[calc(100vh-65px)] overflow-hidden bg-background">
-      {/* ── Left Panel: Smart Lists (sidebar inside the page) ───────────── */}
-      <div className="hidden lg:flex w-56 shrink-0 flex-col border-r border-border bg-card">
-        <div className="border-b border-border px-4 py-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Smart Lists</h3>
-        </div>
-        <div className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
-          {SMART_LISTS.map(list => (
-            <button
-              key={list.id}
-              onClick={() => { setActiveSmartList(list); setActiveTab("smartlists"); }}
-              className={cn(
-                "flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-colors",
-                activeSmartList.id === list.id && activeTab === "smartlists"
-                  ? "bg-primary/10 text-primary font-semibold"
-                  : "text-foreground hover:bg-accent",
-              )}
-            >
-              <div className="flex items-center gap-2.5">
-                <list.icon className="h-3.5 w-3.5" style={{ color: list.color }} />
-                <span>{list.name}</span>
-              </div>
-              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-bold text-muted-foreground">
-                {list.count}
-              </span>
-            </button>
-          ))}
-
-          <div className="my-2 border-t border-border" />
-
-          <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-primary hover:bg-primary/5 transition-colors">
-            <Plus className="h-3.5 w-3.5" />
-            New Smart List
-          </button>
-        </div>
-
-        {/* Companies quick list */}
-        <div className="border-t border-border px-4 py-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Companies</h3>
-          <div className="space-y-0.5">
-            {MOCK_COMPANIES.slice(0, 3).map(co => (
-              <button
-                key={co.id}
-                onClick={() => setActiveTab("companies")}
-                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-foreground hover:bg-accent transition-colors"
-              >
-                <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="truncate">{co.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* ── Main Area ──────────────────────────────────────────────────────── */}
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Header */}
