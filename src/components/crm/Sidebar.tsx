@@ -233,12 +233,12 @@ export function Sidebar() {
 
       {/* Footer / User Profile */}
       <div className="border-t border-sidebar-border p-3">
-        <button className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-white">
+        <Link to="/settings" onClick={close} className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-white">
           <div className="flex items-center gap-3">
             <Settings className="h-4 w-4 shrink-0" />
             <span>Settings</span>
           </div>
-        </button>
+        </Link>
         <div className="mt-2 flex items-center gap-3 rounded-lg bg-sidebar-accent/50 p-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-xs font-semibold text-white">
             AC

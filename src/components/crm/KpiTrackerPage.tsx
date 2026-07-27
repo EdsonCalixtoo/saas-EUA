@@ -162,7 +162,7 @@ export function KpiTrackerPage() {
 
           {/* Action & Filter Controls */}
           <div className="flex flex-wrap items-center gap-3">
-            <Select value={timeframe} onValueChange={setTimeframe}>
+            <Select value={timeframe} onValueChange={(val) => setTimeframe(val || 'week')}>
               <SelectTrigger className="w-[140px] h-9 text-xs font-semibold rounded-xl bg-background border-border">
                 <Calendar className="h-3.5 w-3.5 mr-1.5 text-emerald-600" />
                 <SelectValue placeholder="Período" />
@@ -175,7 +175,7 @@ export function KpiTrackerPage() {
               </SelectContent>
             </Select>
 
-            <Select value={agentFilter} onValueChange={setAgentFilter}>
+            <Select value={agentFilter} onValueChange={(val) => setAgentFilter(val || 'all')}>
               <SelectTrigger className="w-[160px] h-9 text-xs font-semibold rounded-xl bg-background border-border">
                 <Users className="h-3.5 w-3.5 mr-1.5 text-indigo-600" />
                 <SelectValue placeholder="Corretor / Time" />
