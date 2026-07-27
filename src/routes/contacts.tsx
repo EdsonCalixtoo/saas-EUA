@@ -6,8 +6,8 @@ import { ContactsPage } from "@/components/crm/ContactsPage";
 export const Route = createFileRoute("/contacts")({
   head: () => ({
     meta: [
-      { title: "Contacts Directory — DealVanta CRM" },
-      { name: "description", content: "Consolidated contacts directory for sellers, cash buyers, title companies, and contractors." },
+      { title: "Contacts — DealVanta CRM" },
+      { name: "description", content: "Manage all your real estate contacts — sellers, buyers, agents, lenders, and title companies in one place." },
     ],
   }),
   component: ContactsRoute,
